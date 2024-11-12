@@ -5,7 +5,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.project.bookreviewapp.entity.Review;
+
 @Repository
-public interface Review extends JpaRepository<Review, UUID> {
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
 }
