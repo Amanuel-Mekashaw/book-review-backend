@@ -1,5 +1,6 @@
 package com.project.bookreviewapp.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,5 +10,5 @@ import com.project.bookreviewapp.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-
+    Optional<User> findByEmail(String email);
 }
