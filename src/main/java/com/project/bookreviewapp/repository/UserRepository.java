@@ -11,4 +11,5 @@ import com.project.bookreviewapp.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
+
 }

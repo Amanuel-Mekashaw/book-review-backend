@@ -10,8 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +27,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -56,11 +60,6 @@ public class User implements UserDetails {
 
     @OneToOne
     private AuthorDetail authorDetails;
-
-    @Column(name = "profile_picture")
-    private String profilePicture;
-
-    private String bio;
 
     @Column(name = "created_at")
     @CreatedDate
