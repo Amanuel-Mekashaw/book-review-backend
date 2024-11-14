@@ -2,6 +2,7 @@ package com.project.bookreviewapp.entity;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,9 @@ public class AuthorDetail {
 
     @OneToOne
     private User user;
+
+    @Column(name = "profile_picture")
+    private String profilePicture;
 
     private String biography;
 
