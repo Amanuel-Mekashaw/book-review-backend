@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import java.util.UUID;
 public class UserDTO {
 
     // @NotNull // it's auto generated
-    private UUID id;
+    private Long id;
 
     @NotBlank
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
