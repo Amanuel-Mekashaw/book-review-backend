@@ -58,9 +58,6 @@ public class Book {
     @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-    private List<Review> reviews;
-
     @Column(name = "cover_image")
     private String coverImage;
 
