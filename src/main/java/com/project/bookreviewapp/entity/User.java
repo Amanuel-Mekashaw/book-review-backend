@@ -54,9 +54,6 @@ public class User implements UserDetails {
     private Status status;
 
     // @OneToMany(mappedBy = "user")
-    // private List<Review> reviews;
-
-    // @OneToMany(mappedBy = "user")
     // private List<Collection> collections;
 
     @OneToOne(fetch = FetchType.LAZY)

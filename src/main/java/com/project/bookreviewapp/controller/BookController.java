@@ -54,7 +54,7 @@ public class BookController {
     @PostMapping
     public ResponseEntity<ApiResponse<Book>> createBook(@RequestBody @Valid BookDTO bookDTO) {
         System.err.println("\n\n\n " + bookDTO + "\n\n\n");
-        User foundAuthor = userRepository.findById(bookDTO.getId()).orElseThrow(
+        User foundAuthor = userRepository.findById(bookDTO.getAuthorId()).orElseThrow(
                 () -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
 
         System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
