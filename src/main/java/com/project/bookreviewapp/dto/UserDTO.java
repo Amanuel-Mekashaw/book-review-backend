@@ -6,15 +6,17 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserDTO {
 
-    // @NotNull // it's auto generated
+    // @NotNull
     private Long id;
 
     @NotBlank
@@ -34,11 +36,6 @@ public class UserDTO {
 
     @NotBlank
     private String status; // e.g., {"ACTIVE", "INACTIVE"}
-
-    private String profilePicture;
-
-    @Size(max = 500, message = "Bio should not exceed 500 characters")
-    private String bio;
 
     // Optional: only include these fields if you want them in the creation process
     private LocalDateTime createdAt;

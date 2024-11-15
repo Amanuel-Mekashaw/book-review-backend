@@ -4,10 +4,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,6 +23,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @Builder
@@ -51,21 +53,23 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
+    // @OneToMany(mappedBy = "user")
+    // private List<Review> reviews;
 
-    @OneToMany(mappedBy = "user")
-    private List<Collection> collections;
+    // @OneToMany(mappedBy = "user")
+    // private List<Collection> collections;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private AuthorDetail authorDetails;
 
     @Column(name = "created_at")
     @CreatedDate
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @LastModifiedDate
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public enum Role {

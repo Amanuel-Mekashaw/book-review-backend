@@ -11,4 +11,7 @@ import com.project.bookreviewapp.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    // Optional<User> findByUsername(String userName);
+
+    // Optional<User> findById(@NonNull Long id);
 }
