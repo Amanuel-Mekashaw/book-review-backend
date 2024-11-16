@@ -16,25 +16,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-        private final AuthenticationProvider authenticationProvider;
-        private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
-        @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                return http.csrf(csrf -> csrf
-                                .disable())
-                                .authorizeHttpRequests(requests -> requests
-                                                .requestMatchers("/api/v1/auth/**", "/api/v1/genre/**")
-                                                // .requestMatchers("/error")
-                                                .permitAll()
-                                                .anyRequest()
-                                                .authenticated())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                .authenticationProvider(authenticationProvider)
-                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                                .build();
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/api/v1/auth/**")
+                        // .requestMatchers("/error")
+                        .permitAll().anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
 
-        }
+    }
 
 }
