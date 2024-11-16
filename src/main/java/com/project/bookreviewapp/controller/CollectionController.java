@@ -12,6 +12,7 @@ import com.project.bookreviewapp.service.CollectionService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 
@@ -52,7 +53,7 @@ public class CollectionController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody CollectionDTO collectionDto) {
+    public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody @Valid CollectionDTO collectionDto) {
         Collection collection = collectionService
                 .saveCollection(CollectionMapper.collectionDTOToCollection(collectionDto));
 
@@ -62,7 +63,7 @@ public class CollectionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Collection>> updateCollection(@RequestBody CollectionDTO collectionDTO,
+    public ResponseEntity<ApiResponse<Collection>> updateCollection(@RequestBody @Valid CollectionDTO collectionDTO,
             @PathVariable Long id) {
 
         Collection foundCollection = collectionService.getCollection(collectionDTO.getId());

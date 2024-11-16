@@ -23,6 +23,7 @@ import com.project.bookreviewapp.service.GenreService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/genre")
@@ -50,7 +51,7 @@ public class GenreController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Genre>> createGenre(@RequestBody GenreDTO genreDTO) {
+    public ResponseEntity<ApiResponse<Genre>> createGenre(@RequestBody @Valid GenreDTO genreDTO) {
         Genre genre = genreService.createGenre(GenreMapper.genreDTOToGenre(genreDTO));
 
         ApiResponse<Genre> apiResponse = new ApiResponse<Genre>("Genre created successfully", 201, genre);
@@ -59,7 +60,8 @@ public class GenreController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Genre>> updateGenre(@RequestBody GenreDTO genreDTO, @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Genre>> updateGenre(@RequestBody @Valid GenreDTO genreDTO,
+            @PathVariable Long id) {
         Genre foundGenre = genreService.getGenre(id)
                 .orElseThrow(() -> new EntityNotFoundException("Genre with id " + id + "not found"));
 

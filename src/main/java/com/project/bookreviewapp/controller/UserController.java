@@ -14,6 +14,7 @@ import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
 import com.project.bookreviewapp.service.implementation.AuthenticationServiceImpl;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,13 +25,13 @@ public class UserController {
     private final AuthenticationServiceImpl authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
 
         return new ResponseEntity<>(authenticationService.register(request), HttpStatus.OK);
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request)
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
             throws Exception {
         try {
             return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
