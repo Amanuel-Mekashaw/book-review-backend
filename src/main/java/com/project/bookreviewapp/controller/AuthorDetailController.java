@@ -20,6 +20,7 @@ import com.project.bookreviewapp.service.AuthorDetailService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/userdetail")
@@ -41,29 +42,34 @@ public class AuthorDetailController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<AuthorDetail>> createAuthorDetail(@RequestBody AuthorDetailDTO authorDetailDTO) {
+    public ResponseEntity<ApiResponse<AuthorDetail>> createAuthorDetail(
+            @RequestBody @Valid AuthorDetailDTO authorDetailDTO) {
         User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
 
         AuthorDetail authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
 
+        ApiResponse<AuthorDetail> apiResponse;
         if (user != null) {
-            authorDetail = authorDetailService
-                    .createAuthorDetail(AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO));
-            user.setAuthorDetails(authorDetail);
+            // user.setAuthorDetails(authorDetail);
+            authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
             authorDetail.setUser(user);
+            authorDetail = authorDetailService.createAuthorDetail(authorDetail);
 
+            apiResponse = new ApiResponse<>("Author detail created successfully", 201, authorDetail);
+
+            return new ResponseEntity<ApiResponse<AuthorDetail>>(apiResponse, HttpStatus.CREATED);
+        } else {
+            apiResponse = new ApiResponse<>("Couldn't create Author detail ", 403, authorDetail);
+
+            return new ResponseEntity<ApiResponse<AuthorDetail>>(apiResponse, HttpStatus.FORBIDDEN);
         }
 
-        ApiResponse<AuthorDetail> apiResponse = new ApiResponse<>("Author detail created successfully", 201,
-                authorDetail);
-
-        return new ResponseEntity<ApiResponse<AuthorDetail>>(apiResponse, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<AuthorDetail>> updateAuthorDetail(@RequestBody AuthorDetailDTO authorDetailDTO,
-            @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AuthorDetail>> updateAuthorDetail(
+            @RequestBody @Valid AuthorDetailDTO authorDetailDTO, @PathVariable Long id) {
 
         User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));

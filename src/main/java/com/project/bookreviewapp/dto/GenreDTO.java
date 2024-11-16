@@ -17,4 +17,6 @@ public class GenreDTO {
     @NotNull
     private String name;
 
+    private String description;
+
 }
