@@ -24,15 +24,14 @@ public class UserController {
     private final AuthenticationServiceImpl authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
 
         return new ResponseEntity<>(authenticationService.register(request), HttpStatus.OK);
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request) throws Exception {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request)
+            throws Exception {
         try {
             return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
         } catch (AuthenticationException e) {
