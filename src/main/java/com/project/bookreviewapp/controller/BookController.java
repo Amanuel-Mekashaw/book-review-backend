@@ -11,6 +11,8 @@ import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.BookService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
@@ -40,22 +42,25 @@ public class BookController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Get all books", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
     public ResponseEntity<Page<Book>> listAllBooks(@PageableDefault(size = 10) Pageable pageable) {
         Page<Book> books = bookService.getAllBooks(pageable);
         return new ResponseEntity<Page<Book>>(books, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get single book", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBook(@PathVariable Long id) {
         return new ResponseEntity<Book>(bookService.getBookById(id), HttpStatus.OK);
     }
 
+    @Operation(summary = "create a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     public ResponseEntity<ApiResponse<Book>> createBook(@RequestBody @Valid BookDTO bookDTO) {
         System.err.println("\n\n\n " + bookDTO + "\n\n\n");
-        User foundAuthor = userRepository.findById(bookDTO.getAuthorId()).orElseThrow(
-                () -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
+        User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
+                .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
 
         System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
 
@@ -71,12 +76,13 @@ public class BookController {
 
     }
 
+    @Operation(summary = "update a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Book>> updateBook(@RequestBody @Valid BookDTO bookDTO, @PathVariable Long id) {
         Book foundBook = bookService.getBookById(id);
 
-        User foundAuthor = userRepository.findById(bookDTO.getAuthorId()).orElseThrow(
-                () -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
+        User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
+                .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
 
         foundBook = BookMapper.bookDtoToBook(bookDTO);
         foundBook.setAuthor(foundAuthor);
@@ -87,11 +93,11 @@ public class BookController {
         return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.OK);
     }
 
+    @Operation(summary = "delete a book", security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable Long id) throws Exception {
         bookService.deleteBook(id);
-        ApiResponse<String> apiResponse = new ApiResponse<>(
-                "Deleted book with isbn " + id, 404);
+        ApiResponse<String> apiResponse = new ApiResponse<>("Deleted book with isbn " + id, 404);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
