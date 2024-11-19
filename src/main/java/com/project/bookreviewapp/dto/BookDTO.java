@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class BookDTO {
-    // @NotNull(message = "Book ID cannot be null")
+
     private Long id;
     @NotNull(message = "Book title cannot be null")
     private String title;

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CollectionDTO {
-    // @NotNull(message = "id must't be null")
+
     private Long id;
 
     @NotNull

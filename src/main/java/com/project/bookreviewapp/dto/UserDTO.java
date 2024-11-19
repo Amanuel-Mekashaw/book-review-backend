@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @Builder
 public class UserDTO {
 
-    // @NotNull
     private Long id;
 
     @NotBlank

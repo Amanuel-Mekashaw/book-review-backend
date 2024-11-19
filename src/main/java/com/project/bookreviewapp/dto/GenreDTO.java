@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class GenreDTO {
-    // @NotNull
+
     private Long id;
 
     @NotNull
