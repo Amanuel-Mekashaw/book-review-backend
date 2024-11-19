@@ -43,7 +43,7 @@ public class GenreServiceImpl implements GenreService {
         try {
             genreRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            log.debug("genre with this id" + id + " doesn't exist" + ex.getMessage());
+            log.debug("\n\n\ngenre with this id" + id + " doesn't exist" + ex.getMessage());
         }
     }
 

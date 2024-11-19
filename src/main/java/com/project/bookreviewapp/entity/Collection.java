@@ -45,7 +45,7 @@ public class Collection {
 
     private String description;
 
-    @ManyToMany(mappedBy = "books")
+    @ManyToMany(mappedBy = "collections")
     private List<Book> books;
 
     @CreatedDate

@@ -58,16 +58,16 @@ public class BookController {
     @Operation(summary = "create a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     public ResponseEntity<ApiResponse<Book>> createBook(@RequestBody @Valid BookDTO bookDTO) {
-        System.err.println("\n\n\n " + bookDTO + "\n\n\n");
+
         User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
 
         System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
 
         Book createdBook = BookMapper.bookDtoToBook(bookDTO);
-        createdBook.setAuthor(foundAuthor);
-        createdBook.setCreatedAt(LocalDateTime.now());
-        createdBook.setUpdatedAt(LocalDateTime.now());
+        // createdBook.setAuthor(foundAuthor);
+        // createdBook.setCreatedAt(LocalDateTime.now());
+        // createdBook.setUpdatedAt(LocalDateTime.now());
 
         createdBook = bookService.saveBook(createdBook);
 
@@ -84,13 +84,22 @@ public class BookController {
         User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
 
-        foundBook = BookMapper.bookDtoToBook(bookDTO);
-        foundBook.setAuthor(foundAuthor);
-        foundBook = bookService.saveBook(foundBook);
+        ApiResponse<Book> apiResponse;
+        if (foundBook != null && foundAuthor != null) {
+            foundBook = BookMapper.bookDtoToBook(bookDTO);
+            foundBook.setId(id);
+            if (foundBook.getCreatedAt() == null) {
+                foundBook.setCreatedAt(LocalDateTime.now());
+            }
+            foundBook.setCreatedAt(foundBook.getCreatedAt());
+            foundBook = bookService.saveBook(foundBook);
 
-        ApiResponse<Book> apiResponse = new ApiResponse<Book>("book updated successfully", 200, foundBook);
-
-        return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.OK);
+            apiResponse = new ApiResponse<Book>("book updated successfully", 200, foundBook);
+            return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<Book>("book didn't update", 401, null);
+            return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.OK);
+        }
     }
 
     @Operation(summary = "delete a book", security = @SecurityRequirement(name = "bearerAuth"))

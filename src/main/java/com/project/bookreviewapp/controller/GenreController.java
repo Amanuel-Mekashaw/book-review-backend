@@ -26,7 +26,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/genre")
+@RequestMapping("/api/v1/genre")
 public class GenreController {
 
     private final GenreService genreService;
@@ -37,7 +37,7 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 10) Pageable pageable) {
-
+        System.out.println("------\n\n\n" + pageable + "\n\n\n");
         Page<Genre> genres = genreService.getAllGenre(pageable);
         return new ResponseEntity<Page<Genre>>(genres, HttpStatus.OK);
     }
@@ -80,7 +80,7 @@ public class GenreController {
 
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteGenre(@PathVariable Long id) {
         genreService.deleteGenre(id);
         ApiResponse<String> apiResponse = new ApiResponse<>("genre deleted successfully", 404);

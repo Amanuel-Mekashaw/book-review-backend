@@ -71,27 +71,30 @@ public class AuthorDetailController {
     public ResponseEntity<ApiResponse<AuthorDetail>> updateAuthorDetail(
             @RequestBody @Valid AuthorDetailDTO authorDetailDTO, @PathVariable Long id) {
 
-        User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
-                () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
-
         AuthorDetail foundAuthorDetail = authorDetailService.getAuthorDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("no author detail found by this id " + id));
 
-        if (user != null) {
+        System.out.println("\n\nfound author detail------\n" + foundAuthorDetail + "\n\n\n");
+
+        User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
+                () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
+
+        System.out.println("\n\nfound user------\n" + user + "\n\n\n");
+
+        ApiResponse<AuthorDetail> apiResponse;
+
+        if (user != null && foundAuthorDetail != null) {
             foundAuthorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
-            foundAuthorDetail.setUser(user);
-        }
-
-        if (foundAuthorDetail.getId() == id) {
+            foundAuthorDetail.setId(id);
+            // foundAuthorDetail.setUser(user);
             foundAuthorDetail = authorDetailService.createAuthorDetail(foundAuthorDetail);
-            ApiResponse<AuthorDetail> apiResponse = new ApiResponse<>("Author detail created successfully", 201,
-                    foundAuthorDetail);
-            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
+            System.out.println("\n\nupdated user------\n" + foundAuthorDetail + "\n\n\n");
+            apiResponse = new ApiResponse<>("Author detail updated successfully", 201, foundAuthorDetail);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } else {
-            ApiResponse<AuthorDetail> apiResponseError = new ApiResponse<AuthorDetail>("No author detail to be found",
-                    404, null);
-            return new ResponseEntity<>(apiResponseError, HttpStatus.OK);
+            apiResponse = new ApiResponse<AuthorDetail>("can't update user detail", 404, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         }
 
     }

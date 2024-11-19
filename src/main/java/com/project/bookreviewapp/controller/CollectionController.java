@@ -14,8 +14,6 @@ import com.project.bookreviewapp.utils.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -54,8 +52,19 @@ public class CollectionController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody @Valid CollectionDTO collectionDto) {
-        Collection collection = collectionService
-                .saveCollection(CollectionMapper.collectionDTOToCollection(collectionDto));
+
+        User foundAuthor = userRepository.findById(collectionDto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("user by " + collectionDto.getUserId() + " not found"));
+
+        System.out.println("\n\ncollection dto\n----- " + collectionDto + "\n\n\n");
+
+        System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
+
+        Collection collection = CollectionMapper.collectionDTOToCollection(collectionDto);
+        collection.setUser(foundAuthor);
+        collection = collectionService.saveCollection(collection);
+
+        System.out.println("\n\nsaved collection \n----- " + collection + "\n\n\n");
 
         ApiResponse<Collection> apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
 
@@ -66,28 +75,26 @@ public class CollectionController {
     public ResponseEntity<ApiResponse<Collection>> updateCollection(@RequestBody @Valid CollectionDTO collectionDTO,
             @PathVariable Long id) {
 
-        Collection foundCollection = collectionService.getCollection(collectionDTO.getId());
+        Collection foundCollection = collectionService.getCollection(id);
         User foundUser = userRepository.findById(collectionDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id " + collectionDTO.getUserId() + " isn't found"));
 
-        if (foundCollection != null && foundUser != null) {
+        ApiResponse<Collection> apiResponse;
+        if (foundCollection != null) {
             foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
-            foundCollection.setUser(foundUser);
-            foundCollection.setCreatedAt(LocalDateTime.now());
-            foundCollection.setUpdatedAt(LocalDateTime.now());
+            foundCollection.setId(id);
             foundCollection = collectionService.saveCollection(foundCollection);
 
-            ApiResponse<Collection> apiResponse = new ApiResponse<>("collection updated successfully", 200,
-                    foundCollection);
+            apiResponse = new ApiResponse<>("collection updated successfully", 200, foundCollection);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } else {
-            ApiResponse<Collection> apiResponse = new ApiResponse<>("collection disn't update", 200, null);
+            apiResponse = new ApiResponse<>("collection disn't update", 401, null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         }
 
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteCollection(@PathVariable Long id) {
         collectionService.deleteCollection(id);
         ApiResponse<String> apiResponse = new ApiResponse<>("collection deleted successfully", 404);
