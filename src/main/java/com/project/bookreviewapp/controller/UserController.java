@@ -13,6 +13,7 @@ import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
 import com.project.bookreviewapp.service.implementation.AuthenticationServiceImpl;
+import com.project.bookreviewapp.utils.ApiResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,11 @@ public class UserController {
     private final AuthenticationServiceImpl authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> register(@RequestBody @Valid RegisterRequest request) {
 
-        return new ResponseEntity<>(authenticationService.register(request), HttpStatus.OK);
+        ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>("Authenticated Successfully", 200,
+                authenticationService.register(request));
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     @PostMapping("/authenticate")

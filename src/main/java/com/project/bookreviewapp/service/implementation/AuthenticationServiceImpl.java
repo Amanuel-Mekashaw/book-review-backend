@@ -35,6 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+
         var user = User.builder().userName(request.getUsername()).email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword())).role(Role.USER).status(Status.ACTIVE)
                 .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
