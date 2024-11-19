@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AuthorDetailDTO {
-    @NotNull(message = "User ID cannot be null")
+    // @NotNull(message = "User ID cannot be null")
     private Long id;
 
     @Size(max = 1000, message = "Biography must be less than or equal to 500 characters")
