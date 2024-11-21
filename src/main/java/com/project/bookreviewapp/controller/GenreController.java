@@ -37,7 +37,6 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 10) Pageable pageable) {
-        System.out.println("------\n\n\n" + pageable + "\n\n\n");
         Page<Genre> genres = genreService.getAllGenre(pageable);
         return new ResponseEntity<Page<Genre>>(genres, HttpStatus.OK);
     }

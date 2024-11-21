@@ -56,15 +56,9 @@ public class CollectionController {
         User foundAuthor = userRepository.findById(collectionDto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + collectionDto.getUserId() + " not found"));
 
-        System.out.println("\n\ncollection dto\n----- " + collectionDto + "\n\n\n");
-
-        System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
-
         Collection collection = CollectionMapper.collectionDTOToCollection(collectionDto);
         collection.setUser(foundAuthor);
         collection = collectionService.saveCollection(collection);
-
-        System.out.println("\n\nsaved collection \n----- " + collection + "\n\n\n");
 
         ApiResponse<Collection> apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
 
@@ -80,7 +74,7 @@ public class CollectionController {
                 () -> new EntityNotFoundException("user by this id " + collectionDTO.getUserId() + " isn't found"));
 
         ApiResponse<Collection> apiResponse;
-        if (foundCollection != null) {
+        if (foundCollection != null && foundUser != null) {
             foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
             foundCollection.setId(id);
             foundCollection = collectionService.saveCollection(foundCollection);
@@ -88,7 +82,7 @@ public class CollectionController {
             apiResponse = new ApiResponse<>("collection updated successfully", 200, foundCollection);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } else {
-            apiResponse = new ApiResponse<>("collection disn't update", 401, null);
+            apiResponse = new ApiResponse<>("collection didn't update", 401, null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         }
 

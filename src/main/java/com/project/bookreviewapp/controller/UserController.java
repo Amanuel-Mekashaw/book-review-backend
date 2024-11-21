@@ -4,9 +4,12 @@ import javax.naming.AuthenticationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.bookreviewapp.auth.AuthenticationRequest;
@@ -34,15 +37,52 @@ public class UserController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request)
-            throws Exception {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(
+            @RequestBody @Valid AuthenticationRequest request) throws Exception {
+
+        ApiResponse<AuthenticationResponse> apiResponse;
         try {
-            return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
+            apiResponse = new ApiResponse<>("successfull", 200, authenticationService.authenticate(request));
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // Return 401 Unauthorized
+            apiResponse = new ApiResponse<>("unauthorized access invalid credientials", 401, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Return 500 for other errors
+            apiResponse = new ApiResponse<>("error was thrown server error", 500, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/assign-role")
+    public ResponseEntity<ApiResponse<String>> assignRole(@RequestHeader("Authorization") String token,
+            @RequestParam String username, @RequestParam String role) throws Exception {
+
+        ApiResponse<String> apiResponse;
+
+        // Ensure the token starts with "Bearer "
+        if (token == null || !token.startsWith("Bearer ")) {
+            apiResponse = new ApiResponse<>("Token is missing or invalid", 400);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Call service to assign role, token is already passed to check permission of
+            // the user
+            authenticationService.assignRole(token, username, role);
+        } catch (AuthenticationException e) {
+            // Handle invalid permissions, if a non-admin tries to assign roles
+            apiResponse = new ApiResponse<>(e.getMessage(), 403); // Use Forbidden instead of Unauthorized
+            return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            // Handle any other server-side errors
+            apiResponse = new ApiResponse<>("An error occurred on the server", 500);
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // On success, return the success message
+        apiResponse = new ApiResponse<>("Role assigned successfully!", 200, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
 }

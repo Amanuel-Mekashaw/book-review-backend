@@ -22,10 +22,11 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                .authorizeHttpRequests(requests -> requests.requestMatchers("/api/v1/auth/assign-role")
+                        .hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/authenticate", "/v3/api-docs/**",
+                                "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll().anyRequest().authenticated())
-                .cors(cors -> cors.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();

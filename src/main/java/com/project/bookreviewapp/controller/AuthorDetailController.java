@@ -74,12 +74,8 @@ public class AuthorDetailController {
         AuthorDetail foundAuthorDetail = authorDetailService.getAuthorDetail(id)
                 .orElseThrow(() -> new EntityNotFoundException("no author detail found by this id " + id));
 
-        System.out.println("\n\nfound author detail------\n" + foundAuthorDetail + "\n\n\n");
-
         User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
-
-        System.out.println("\n\nfound user------\n" + user + "\n\n\n");
 
         ApiResponse<AuthorDetail> apiResponse;
 
@@ -89,7 +85,6 @@ public class AuthorDetailController {
             // foundAuthorDetail.setUser(user);
             foundAuthorDetail = authorDetailService.createAuthorDetail(foundAuthorDetail);
 
-            System.out.println("\n\nupdated user------\n" + foundAuthorDetail + "\n\n\n");
             apiResponse = new ApiResponse<>("Author detail updated successfully", 201, foundAuthorDetail);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } else {

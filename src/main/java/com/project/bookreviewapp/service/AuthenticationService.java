@@ -10,4 +10,6 @@ public interface AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception;
 
+    public void assignRole(String token, String email, String role) throws Exception;
+
 }

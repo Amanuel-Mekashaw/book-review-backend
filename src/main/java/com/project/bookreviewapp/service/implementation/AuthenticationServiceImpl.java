@@ -1,5 +1,6 @@
 package com.project.bookreviewapp.service.implementation;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 
 import javax.naming.AuthenticationException;
@@ -7,6 +8,7 @@ import javax.naming.AuthenticationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +39,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
 
         var user = User.builder().userName(request.getUsername()).email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword())).role(Role.USER).status(Status.ACTIVE)
+                .passwordHash(passwordEncoder.encode(request.getPassword())).role(Role.ADMIN).status(Status.ACTIVE)
                 .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
 
         repository.save(user);
@@ -65,6 +67,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("An error occurred during authentication", ex);
         }
 
+    }
+
+    public void assignRole(String token, String username, String role) throws Exception {
+        // Extract the role of the requester
+        String requesterRole = jwtService.extractRole(token.replace("Bearer ", ""));
+
+        if (!"ADMIN".equalsIgnoreCase(requesterRole)) {
+            throw new AccessDeniedException("Only ADMIN can assign roles.");
+        }
+
+        // Validate the role being assigned
+        Role newRole;
+
+        try {
+            newRole = Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+
+        // Fetch the user and assign the role
+        User user = repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        user.setRole(newRole);
+        repository.save(user);
+
+        log.info("Role {} assigned to user {}", newRole, username);
     }
 
 }

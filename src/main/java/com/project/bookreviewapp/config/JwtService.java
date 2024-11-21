@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +33,27 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        String role = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst()
+                .orElse("ADMIN");
+
+        extraClaims.put("role", role);
+        return generateToken(extraClaims, userDetails);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        final String role = extractRole(token).toUpperCase();
+        return (username.equals(userDetails.getUsername())) && role.equals("ADMIN") && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
         return extratExpiration(token).before(new Date());
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     private Date extratExpiration(String token) {
@@ -50,29 +62,22 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         try {
-            return Jwts
-                    .builder()
-                    .setClaims(extraClaims)
-                    .setSubject(userDetails.getUsername())
+
+            return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                    .compact();
+                    .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
         } catch (RuntimeException ex) {
-            throw new RuntimeException("Error generating JWT token", ex); // Log and rethrow if necessary
+            throw new RuntimeException("Error generating JWT token", ex);
         }
 
     }
 
     public Claims extractAllClaims(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSignInKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
         } catch (JwtException e) {
-            throw new UnsupportedJwtException("Invalid or unsupported JWT token", e); // Better error handling
+            throw new UnsupportedJwtException("Invalid or unsupported JWT token", e);
         }
 
     }
