@@ -20,11 +20,6 @@ public class AuthorDetailMapper {
         }
 
         return authorDetail;
-
-        // return
-        // AuthorDetail.builder().id(authorDetailDTO.getId()).biography(authorDetailDTO.getBiography())
-        // .profilePicture(authorDetailDTO.getProfilePicture()).socialLinks(authorDetailDTO.getSocialLinks())
-        // .user(null).build();
     }
 
     public static AuthorDetailDTO authorDetailToAuthorDetailDto(AuthorDetail authorDetail) {
@@ -37,11 +32,6 @@ public class AuthorDetailMapper {
         }
 
         return authorDetailDTO;
-
-        // return
-        // AuthorDetailDTO.builder().id(authorDetail.getId()).biography(authorDetail.getBiography())
-        // .profilePicture(authorDetail.getProfilePicture()).socialLinks(authorDetail.getSocialLinks())
-        // .userId(null).build();
     }
 
 }

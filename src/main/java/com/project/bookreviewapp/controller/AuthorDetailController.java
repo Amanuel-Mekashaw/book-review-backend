@@ -41,6 +41,45 @@ public class AuthorDetailController {
         return new ResponseEntity<AuthorDetail>(authorDetail, HttpStatus.OK);
     }
 
+    // @GetMapping("/by-author/{authorId}")
+    // public ResponseEntity<ApiResponse<User>> getUserByAuthorId(@PathVariable Long
+    // authorId) {
+    // User user = authorDetailService.getUserByAuthorId(authorId)
+    // .orElseThrow(() -> new EntityNotFoundException("\n\n\nUser with id" +
+    // authorId + "not found\n\n\n"));
+    // ApiResponse<User> apiResponse;
+    // if (user == null) {
+    // apiResponse = new ApiResponse<User>("user found", 200, user);
+    // return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    // } else {
+    // apiResponse = new ApiResponse<>("user not found", 404, null);
+    // return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+    // }
+
+    // }
+
+    @GetMapping("/by-author/{authorId}")
+    public ResponseEntity<ApiResponse<User>> getUserByAuthorId(@PathVariable Long authorId) {
+        // Get the user or throw EntityNotFoundException if not found
+        User user = authorDetailService.getUserByAuthorId(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + authorId + " not found"));
+
+        // Build API response if user is found
+        ApiResponse<User> apiResponse = new ApiResponse<>("User found", 200, user);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/by-authordetail/{authorId}")
+    public ResponseEntity<ApiResponse<AuthorDetail>> getUserDetailByAuthorId(@PathVariable Long authorId) {
+        // Get the user or throw EntityNotFoundException if not found
+        AuthorDetail user = authorDetailService.getUserDetailByAuthorId(authorId)
+                .orElseThrow(() -> new EntityNotFoundException("author detail with id " + authorId + " not found"));
+
+        // Build API response if Author Detail is found
+        ApiResponse<AuthorDetail> apiResponse = new ApiResponse<>("User found", 200, user);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<AuthorDetail>> createAuthorDetail(
             @RequestBody @Valid AuthorDetailDTO authorDetailDTO) {

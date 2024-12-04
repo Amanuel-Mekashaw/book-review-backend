@@ -1,14 +1,9 @@
 package com.project.bookreviewapp.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonView;
+import com.project.bookreviewapp.dto.BookAuthorView;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,10 +18,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Entity
@@ -38,26 +37,39 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(BookAuthorView.Summary.class)
     private Long id;
 
     @Column(nullable = false)
+    @JsonView(BookAuthorView.Summary.class)
     private String title;
 
+    @JsonView(BookAuthorView.Summary.class)
     private String isbn;
+
+    @JsonView(BookAuthorView.Summary.class)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnore
+    @JsonView(BookAuthorView.Detailed.class)
     private User author;
 
     @Column(name = "published_year")
+    @JsonView(BookAuthorView.Summary.class)
     private int publishedYear;
 
+    @JsonView(BookAuthorView.Summary.class)
     private String publisher;
+
+    @JsonView(BookAuthorView.Summary.class)
     private int pages;
+
+    @JsonView(BookAuthorView.Summary.class)
     private String language;
 
+    @JsonView(BookAuthorView.Detailed.class)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
@@ -65,25 +77,31 @@ public class Book {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "book_collection", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "collection_id"))
     @JsonIgnore
+    @JsonView(BookAuthorView.Summary.class)
     private List<Collection> collections;
 
     @Column(name = "cover_image")
+    @JsonView(BookAuthorView.Summary.class)
     private String coverImage;
 
     @Column(name = "average_rating")
+    @JsonView(BookAuthorView.Summary.class)
     private double averageRating;
 
     @Column(name = "rating_count")
+    @JsonView(BookAuthorView.Summary.class)
     private int ratingCount;
 
     @CreatedDate
     @Column(name = "created_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonView(BookAuthorView.Summary.class)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonView(BookAuthorView.Summary.class)
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -96,5 +114,4 @@ public class Book {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }

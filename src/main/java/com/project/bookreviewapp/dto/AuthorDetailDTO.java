@@ -18,6 +18,10 @@ public class AuthorDetailDTO {
 
     private Long id;
 
+    private String firstName;
+
+    private String lastName;
+
     @Size(max = 1000, message = "Biography must be less than or equal to 500 characters")
     private String biography;
 

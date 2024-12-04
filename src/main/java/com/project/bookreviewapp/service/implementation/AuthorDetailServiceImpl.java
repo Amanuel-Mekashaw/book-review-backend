@@ -6,6 +6,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.project.bookreviewapp.entity.AuthorDetail;
+import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.repository.AuthorDetailRepository;
 import com.project.bookreviewapp.service.AuthorDetailService;
 
@@ -43,6 +44,15 @@ public class AuthorDetailServiceImpl implements AuthorDetailService {
     @Override
     public boolean isAuthorDetailExist(AuthorDetail authorDetail) {
         return authorDetailRepository.existsById(authorDetail.getId());
+    }
+
+    @Override
+    public Optional<User> getUserByAuthorId(Long authorId) {
+        return authorDetailRepository.findUserByAuthorId(authorId);
+    }
+
+    public Optional<AuthorDetail> getUserDetailByAuthorId(Long authorId) {
+        return authorDetailRepository.findUserDetailByAuthorId(authorId);
     }
 
 }
