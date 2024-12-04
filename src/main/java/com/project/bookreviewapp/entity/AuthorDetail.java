@@ -27,6 +27,12 @@ public class AuthorDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "lst_name")
+    private String lastName;
+
     @OneToOne
     private User user;
 

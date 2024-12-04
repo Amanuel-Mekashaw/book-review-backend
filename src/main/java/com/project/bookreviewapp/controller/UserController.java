@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.bookreviewapp.auth.AssignRole;
 import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
@@ -40,6 +40,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(
             @RequestBody @Valid AuthenticationRequest request) throws Exception {
 
+        System.out.println("\n\n\n" + request + "\n\n\n");
         ApiResponse<AuthenticationResponse> apiResponse;
         try {
             apiResponse = new ApiResponse<>("successfull", 200, authenticationService.authenticate(request));
@@ -56,31 +57,26 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/assign-role")
     public ResponseEntity<ApiResponse<String>> assignRole(@RequestHeader("Authorization") String token,
-            @RequestParam String username, @RequestParam String role) throws Exception {
+            @RequestBody @Valid AssignRole assignRole) throws Exception {
 
         ApiResponse<String> apiResponse;
 
-        // Ensure the token starts with "Bearer "
         if (token == null || !token.startsWith("Bearer ")) {
             apiResponse = new ApiResponse<>("Token is missing or invalid", 400);
             return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
         }
 
         try {
-            // Call service to assign role, token is already passed to check permission of
-            // the user
-            authenticationService.assignRole(token, username, role);
+            authenticationService.assignRole(token, assignRole.getUsername(), assignRole.getRole());
         } catch (AuthenticationException e) {
-            // Handle invalid permissions, if a non-admin tries to assign roles
-            apiResponse = new ApiResponse<>(e.getMessage(), 403); // Use Forbidden instead of Unauthorized
+
+            apiResponse = new ApiResponse<>(e.getMessage(), 403);
             return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            // Handle any other server-side errors
             apiResponse = new ApiResponse<>("An error occurred on the server", 500);
             return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // On success, return the success message
         apiResponse = new ApiResponse<>("Role assigned successfully!", 200, null);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
