@@ -22,6 +22,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     private static final String SECRET_KEY = "EKO/tIYyoEPEhNIEE0yvxs0dlhYtDL5gTKbRvOdJk6E=";
+    private static final long EXPIRATION_TIME_MS = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -44,8 +45,8 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        final String role = extractRole(token).toUpperCase();
-        return (username.equals(userDetails.getUsername())) && role.equals("ADMIN") && !isTokenExpired(token);
+        // final String role = extractRole(token).toUpperCase();
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -65,7 +66,7 @@ public class JwtService {
 
             return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
         } catch (RuntimeException ex) {
             throw new RuntimeException("Error generating JWT token", ex);
