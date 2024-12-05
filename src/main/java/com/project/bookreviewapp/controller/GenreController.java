@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.project.bookreviewapp.dto.BookAuthorView;
 import com.project.bookreviewapp.dto.GenreDTO;
+import com.project.bookreviewapp.dto.GenreView;
 import com.project.bookreviewapp.entity.Genre;
 import com.project.bookreviewapp.mapper.GenreMapper;
 import com.project.bookreviewapp.service.GenreService;
@@ -36,12 +39,14 @@ public class GenreController {
     }
 
     @GetMapping
+    @JsonView(GenreView.Summary.class)
     public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 10) Pageable pageable) {
         Page<Genre> genres = genreService.getAllGenre(pageable);
         return new ResponseEntity<Page<Genre>>(genres, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+    @JsonView(GenreView.Summary.class)
     public ResponseEntity<Genre> getGenre(@PathVariable Long id) {
         Genre genre = genreService.getGenre(id)
                 .orElseThrow(() -> new EntityNotFoundException("Genre with id " + id + " not found"));
@@ -50,6 +55,7 @@ public class GenreController {
     }
 
     @PostMapping
+    @JsonView(GenreView.Summary.class)
     public ResponseEntity<ApiResponse<Genre>> createGenre(@RequestBody @Valid GenreDTO genreDTO) {
         Genre genre = genreService.createGenre(GenreMapper.genreDTOToGenre(genreDTO));
 
@@ -59,6 +65,7 @@ public class GenreController {
     }
 
     @PutMapping("/{id}")
+    @JsonView(GenreView.Summary.class)
     public ResponseEntity<ApiResponse<Genre>> updateGenre(@RequestBody @Valid GenreDTO genreDTO,
             @PathVariable Long id) {
         Genre foundGenre = genreService.getGenre(id)

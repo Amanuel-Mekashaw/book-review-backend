@@ -8,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.project.bookreviewapp.dto.GenreView;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,22 +35,28 @@ public class Genre {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(GenreView.Summary.class)
     private Long id;
 
+    @JsonView(GenreView.Summary.class)
     @Column(unique = true, nullable = false)
     private String name;
 
+    @JsonView(GenreView.Summary.class)
     private String description;
 
+    @JsonView(GenreView.Detailed.class)
     @ManyToMany(mappedBy = "genres")
     @JsonBackReference
     private List<Book> books;
 
+    @JsonView(GenreView.Detailed.class)
     @CreatedDate
     @Column(name = "created_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @JsonView(GenreView.Detailed.class)
     @LastModifiedDate
     @Column(name = "updated_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -62,6 +70,7 @@ public class Genre {
 
     @PreUpdate
     protected void onUpdate() {
+        this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 

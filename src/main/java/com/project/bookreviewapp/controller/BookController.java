@@ -116,6 +116,11 @@ public class BookController {
 
         User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
+        // Fetch the genres
+        List<Genre> genres = genreRepository.findAllById(bookDTO.getGenreIds());
+        if (genres.size() != bookDTO.getGenreIds().size()) {
+            throw new EntityNotFoundException("One or more genres not found");
+        }
 
         ApiResponse<Book> apiResponse;
         if (foundBook != null && foundAuthor != null) {
@@ -125,6 +130,7 @@ public class BookController {
                 foundBook.setCreatedAt(LocalDateTime.now());
             }
             foundBook.setCreatedAt(foundBook.getCreatedAt());
+            foundBook.setGenres(genres);
             foundBook = bookService.saveBook(foundBook);
 
             apiResponse = new ApiResponse<Book>("book updated successfully", 200, foundBook);

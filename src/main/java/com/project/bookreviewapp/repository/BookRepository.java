@@ -16,7 +16,31 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b JOIN FETCH b.genres WHERE b.id = :id")
     Optional<Book> findByIdWithGenres(@Param("id") Long id);
 
-    @Query("SELECT b FROM Book b JOIN FETCH b.genres")
+    // @Query("SELECT b FROM Book b JOIN FETCH b.genres")
+    // @Query("SELECT b FROM Book b JOIN FETCH b.genres WHERE b.author IS NULL OR
+    // b.author = b.author")
+    // @Query("SELECT new com.project.bookreviewapp.dto.BookDTO(b.id, b.title,
+    // b.isbn, b.description, b.publishedYear, b.publisher, b.pages, b.language,
+    // b.genres, b.coverImage) "
+
+    @Query("""
+                SELECT new com.example.dto.BookDTO(
+                    b.id,
+                    b.title,
+                    b.isbn,
+                    b.description,
+                    b.author.id,
+                    b.publishedYear,
+                    b.publisher,
+                    b.pages,
+                    b.language,
+                    b.coverImage,
+                    b.createdAt,
+                    b.updatedAt,
+                    (SELECT GROUP_CONCAT(g.id) FROM b.genres g)
+                )
+                FROM Book b
+            """)
     List<Book> findAllWithGenres();
 
     @Query("SELECT DISTINCT b FROM Book b JOIN b.genres g WHERE g.id=:genreId")

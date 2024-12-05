@@ -66,17 +66,16 @@ public class Book {
     @JsonView(BookAuthorView.Summary.class)
     private String language;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", nullable = false)
     @JsonView(BookAuthorView.Detailed.class)
-    @JsonBackReference
+    // @JsonBackReference
     private User author;
 
-    // @JsonView(BookAuthorView.Detailed.class)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    @JsonManagedReference
-    @JsonView(BookAuthorView.Detailed.class)
+    // @JsonManagedReference
+    @JsonView(BookAuthorView.Summary.class)
     private List<Genre> genres;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
