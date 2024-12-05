@@ -1,5 +1,7 @@
 package com.project.bookreviewapp.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +23,7 @@ public interface BookService {
     // check if the queried book exists
     boolean isBookExist(Book book);
 
+    List<Book> getBookWithGenres(Long id);
+
+    List<Book> getAllBooksWithGenres();
 }

@@ -1,7 +1,9 @@
 package com.project.bookreviewapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.bookreviewapp.dto.BookAuthorView;
 import jakarta.persistence.CascadeType;
@@ -51,11 +53,6 @@ public class Book {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    @JsonView(BookAuthorView.Detailed.class)
-    private User author;
-
     @Column(name = "published_year")
     @JsonView(BookAuthorView.Summary.class)
     private int publishedYear;
@@ -69,9 +66,17 @@ public class Book {
     @JsonView(BookAuthorView.Summary.class)
     private String language;
 
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
     @JsonView(BookAuthorView.Detailed.class)
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonBackReference
+    private User author;
+
+    // @JsonView(BookAuthorView.Detailed.class)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @JsonManagedReference
+    @JsonView(BookAuthorView.Detailed.class)
     private List<Genre> genres;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

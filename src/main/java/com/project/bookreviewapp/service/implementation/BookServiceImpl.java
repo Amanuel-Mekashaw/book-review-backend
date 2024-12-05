@@ -1,5 +1,7 @@
 package com.project.bookreviewapp.service.implementation;
 
+import java.util.List;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +53,14 @@ public class BookServiceImpl implements BookService {
     @Override
     public boolean isBookExist(Book book) {
         return bookRepository.existsById(book.getId());
+    }
+
+    public List<Book> getBookWithGenres(Long id) {
+        return bookRepository.findBooksByGenreId(id);
+    }
+
+    public List<Book> getAllBooksWithGenres() {
+        return bookRepository.findAllWithGenres();
     }
 
 }
