@@ -1,9 +1,7 @@
 package com.project.bookreviewapp.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.bookreviewapp.dto.BookAuthorView;
 import jakarta.persistence.CascadeType;
@@ -74,7 +72,6 @@ public class Book {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "book_genre", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    // @JsonManagedReference
     @JsonView(BookAuthorView.Summary.class)
     private List<Genre> genres;
 

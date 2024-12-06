@@ -10,5 +10,6 @@ import com.project.bookreviewapp.entity.Genre;
 @Repository
 
 public interface GenreRepository extends JpaRepository<Genre, Long> {
+
     List<Genre> findAllById(Iterable<Long> ids);
 }

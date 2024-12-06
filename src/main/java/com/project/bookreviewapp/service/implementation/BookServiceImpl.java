@@ -32,7 +32,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book getBookById(Long id) {
-        return bookRepository.findById(id)
+        return bookRepository.findByIdWithGenres(id)
                 .orElseThrow(() -> new EntityNotFoundException("book with " + id + "not found"));
     }
 
@@ -63,4 +63,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAllWithGenres();
     }
 
+    public Page<Book> findBookByTitle(String title, Pageable pageable) {
+        return bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+    }
 }

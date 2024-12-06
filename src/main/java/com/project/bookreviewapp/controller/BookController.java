@@ -18,7 +18,6 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -65,7 +65,19 @@ public class BookController {
         return new ResponseEntity<Book>(bookService.getBookById(id), HttpStatus.OK);
     }
 
-    // all books with genre
+    @Operation(summary = "Get books by title", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/by-title")
+    public ResponseEntity<?> getBookByTitle(@RequestParam(required = true) String title,
+            @PageableDefault(size = 20) Pageable pageable) {
+        if (title != null) {
+            return new ResponseEntity<Page<Book>>(bookService.findBookByTitle(title, pageable), HttpStatus.OK);
+        } else {
+            Page<Book> books = bookService.getAllBooks(pageable);
+            return new ResponseEntity<>(books, HttpStatus.OK);
+        }
+
+    }
+
     @Operation(summary = "Get single book", security = @SecurityRequirement(name = "bearerAuth"))
     @JsonView(BookAuthorView.Detailed.class)
     @GetMapping("/genre/{id}")
@@ -79,6 +91,7 @@ public class BookController {
         }
     }
 
+    // all books with genre
     @GetMapping("/allgenre")
     public ResponseEntity<List<Book>> getAllBooksWithGenres() {
         List<Book> books = bookService.getAllBooksWithGenres();
@@ -99,8 +112,7 @@ public class BookController {
 
         System.err.println("\n\n\n " + foundAuthor + "\n\n\n");
 
-        Book createdBook = BookMapper.bookDtoToBook(bookDTO, userRepository);
-        // createdBook.setAuthor(foundAuthor);
+        Book createdBook = BookMapper.bookDtoToBook(bookDTO, userRepository, genreRepository);
         createdBook.setGenres(genres);
 
         createdBook = bookService.saveBook(createdBook);
@@ -124,7 +136,7 @@ public class BookController {
 
         ApiResponse<Book> apiResponse;
         if (foundBook != null && foundAuthor != null) {
-            foundBook = BookMapper.bookDtoToBook(bookDTO, userRepository);
+            foundBook = BookMapper.bookDtoToBook(bookDTO, userRepository, genreRepository);
             foundBook.setId(id);
             if (foundBook.getCreatedAt() == null) {
                 foundBook.setCreatedAt(LocalDateTime.now());

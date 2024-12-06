@@ -26,4 +26,6 @@ public interface BookService {
     List<Book> getBookWithGenres(Long id);
 
     List<Book> getAllBooksWithGenres();
+
+    Page<Book> findBookByTitle(String title, Pageable pageable);
 }
