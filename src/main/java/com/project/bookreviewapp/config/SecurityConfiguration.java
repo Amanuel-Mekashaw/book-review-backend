@@ -24,7 +24,8 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigSource.corsConfigurationSource()))
-                .authorizeHttpRequests(requests -> requests.requestMatchers("/api/v1/auth/assign-role")
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/api/v1/auth/assign-role", "/api/v1/auth/all", "/api/v1/auth/delete/**")
                         .hasAuthority("ADMIN").requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/authenticate", "/v3/api-docs/**",
                                 "/swagger-ui/**", "/swagger-ui.html")
