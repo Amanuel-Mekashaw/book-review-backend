@@ -116,4 +116,19 @@ public class Book {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void addCollection(Collection collection) {
+        if (!collections.contains(collection)) {
+            collections.add(collection);
+            collection.getBooks().add(this);
+        }
+    }
+
+    public void removeCollection(Collection collection) {
+        if (collections.contains(collection)) {
+            collections.remove(collection);
+            collection.getBooks().remove(this);
+        }
+    }
+
 }

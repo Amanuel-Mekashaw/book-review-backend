@@ -50,6 +50,22 @@ public class CollectionController {
         return new ResponseEntity<>(collectionService.getCollection(id), HttpStatus.OK);
     }
 
+    @PostMapping("/{collectionId}/books/{bookId}")
+    public ResponseEntity<ApiResponse<String>> addBookToCollection(@PathVariable @Valid Long collectionId,
+            @PathVariable @Valid Long bookId) {
+
+        ApiResponse<String> apiResponse;
+
+        try {
+            collectionService.addBookToCollection(bookId, collectionId);
+            apiResponse = new ApiResponse<>("Book successfully added to the collection", 200, null);
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            apiResponse = new ApiResponse<>(e.getMessage(), 404, null);
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody @Valid CollectionDTO collectionDto) {
 
@@ -93,6 +109,22 @@ public class CollectionController {
         collectionService.deleteCollection(id);
         ApiResponse<String> apiResponse = new ApiResponse<>("collection deleted successfully", 404);
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/delete/{collectionId}/books/{bookId}")
+    public ResponseEntity<ApiResponse<String>> removeBookFromCollection(@PathVariable @Valid Long collectionId,
+            @PathVariable @Valid Long bookId) {
+
+        ApiResponse<String> apiResponse;
+
+        try {
+            collectionService.removeBookFromCollection(bookId, collectionId);
+            apiResponse = new ApiResponse<>("Book successfully removed from the collection", 200, null);
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            apiResponse = new ApiResponse<>(e.getMessage(), 404, null);
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

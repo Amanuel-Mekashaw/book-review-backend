@@ -5,7 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.Collection;
+import com.project.bookreviewapp.repository.BookRepository;
 import com.project.bookreviewapp.repository.CollectionRepository;
 import com.project.bookreviewapp.service.CollectionService;
 
@@ -17,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 public class CollectionServiceImpl implements CollectionService {
 
     private final CollectionRepository collectionRepository;
+    private final BookRepository bookRepository;
 
-    public CollectionServiceImpl(CollectionRepository collectionRepository) {
+    public CollectionServiceImpl(CollectionRepository collectionRepository, BookRepository bookRepository) {
         this.collectionRepository = collectionRepository;
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -50,6 +54,29 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     public boolean isCollectionExist(Collection collection) {
         return false;
+    }
+
+    @Override
+    public void addBookToCollection(Long bookId, Long collectionId) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+
+        collection.addBook(book);
+
+        collectionRepository.save(collection);
+    }
+
+    @Override
+    public void removeBookFromCollection(Long bookId, Long collectionId) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+
+        collection.removeBook(book);
+        collectionRepository.save(collection);
     }
 
 }

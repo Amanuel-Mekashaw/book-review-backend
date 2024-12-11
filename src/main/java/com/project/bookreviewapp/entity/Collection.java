@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,15 +48,11 @@ public class Collection {
     @JsonBackReference
     private List<Book> books;
 
-    // TODO remove me
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
     // TODO uncomment this shit
-    // @OneToMany(mappedBy = "collections")
-    // @JsonBackReference
-    // private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    private User user;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -76,6 +73,20 @@ public class Collection {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void addBook(Book book) {
+        if (!books.contains(book)) {
+            books.add(book);
+            book.getCollections().add(this);
+        }
+    }
+
+    public void removeBook(Book book) {
+        if (books.contains(book)) {
+            books.remove(book);
+            book.getCollections().remove(this);
+        }
     }
 
 }

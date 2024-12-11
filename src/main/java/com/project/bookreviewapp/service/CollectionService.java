@@ -15,4 +15,9 @@ public interface CollectionService {
     void deleteCollection(Long id);
 
     boolean isCollectionExist(Collection collection);
+
+    public void addBookToCollection(Long bookId, Long collectionId);
+
+    public void removeBookFromCollection(Long bookId, Long collectionId);
+
 }
