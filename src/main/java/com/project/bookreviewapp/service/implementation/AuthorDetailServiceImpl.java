@@ -10,6 +10,7 @@ import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.repository.AuthorDetailRepository;
 import com.project.bookreviewapp.service.AuthorDetailService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -53,6 +54,11 @@ public class AuthorDetailServiceImpl implements AuthorDetailService {
 
     public Optional<AuthorDetail> getUserDetailByAuthorId(Long authorId) {
         return authorDetailRepository.findUserDetailByAuthorId(authorId);
+    }
+
+    @Override
+    public Optional<AuthorDetail> findUserWithAuthorDetailsById(Long id) {
+        return authorDetailRepository.findUserWithAuthorDetailsById(id);
     }
 
 }

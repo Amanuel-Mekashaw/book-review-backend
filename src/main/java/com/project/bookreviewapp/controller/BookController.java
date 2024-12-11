@@ -91,6 +91,35 @@ public class BookController {
         }
     }
 
+    @Operation(summary = "Get all book by user id", security = @SecurityRequirement(name = "bearerAuth"))
+    @JsonView(BookAuthorView.Detailed.class)
+    @GetMapping("/book-by-author/{authorId}")
+    public ResponseEntity<ApiResponse<?>> getBookByUserId(@PathVariable Long authorId) {
+        List<Book> optionalBook = bookService.findBookByUserId(authorId);
+
+        ApiResponse<?> apiResponse;
+        // System.out.println("\n\n\n" + optionalBook + "\n\n\n");
+
+        if (optionalBook != null) {
+            apiResponse = new ApiResponse<>("All books found successfully", 200, optionalBook);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<>("Books with user id not found", 404, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+
+        // ApiResponse<?> apiResponse;
+        // if (optionalBook != null) {
+        // apiResponse = new ApiResponse<List<Book>>("Found the books", 200,
+        // optionalBook);
+        // return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        // } else {
+        // apiResponse = new ApiResponse<String>("Books not found by the author ", 404,
+        // "");
+        // return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        // }
+    }
+
     // all books with genre
     @GetMapping("/allgenre")
     public ResponseEntity<List<Book>> getAllBooksWithGenres() {

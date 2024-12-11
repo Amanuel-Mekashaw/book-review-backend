@@ -8,6 +8,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -58,7 +61,14 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    // TODO remove me
     // @OneToMany(mappedBy = "user")
+    // private List<Collection> collections;
+
+    // TODO uncomment this shit
+    // @ManyToMany
+    // @JoinTable(name = "user_collection", joinColumns = @JoinColumn(name =
+    // "user_id"), inverseJoinColumns = @JoinColumn(name= "collection_id") )
     // private List<Collection> collections;
 
     @OneToOne(fetch = FetchType.LAZY)

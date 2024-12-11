@@ -16,6 +16,8 @@ import com.project.bookreviewapp.entity.User.Status;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    Optional<User> findById(Long id);
+
     // User findByUsername(String userName);
 
     // general paginated list retrieving

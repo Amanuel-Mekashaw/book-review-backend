@@ -30,7 +30,7 @@ public class AuthorDetail {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "lst_name")
+    @Column(name = "last_name")
     private String lastName;
 
     @OneToOne

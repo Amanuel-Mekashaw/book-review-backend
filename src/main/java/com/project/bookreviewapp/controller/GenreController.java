@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.project.bookreviewapp.dto.BookAuthorView;
 import com.project.bookreviewapp.dto.GenreDTO;
 import com.project.bookreviewapp.dto.GenreView;
 import com.project.bookreviewapp.entity.Genre;

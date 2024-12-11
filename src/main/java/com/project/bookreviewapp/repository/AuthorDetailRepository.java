@@ -18,4 +18,8 @@ public interface AuthorDetailRepository extends JpaRepository<AuthorDetail, Long
 
     @Query("SELECT a FROM AuthorDetail a WHERE a.user.id = :authorId")
     Optional<AuthorDetail> findUserDetailByAuthorId(@Param("authorId") Long authorId);
+
+    @Query("SELECT ad FROM User u LEFT JOIN u.authorDetails ad WHERE u.id = :userId")
+    Optional<AuthorDetail> findUserWithAuthorDetailsById(@Param("userId") Long userId);
+
 }

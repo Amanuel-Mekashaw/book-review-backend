@@ -1,10 +1,15 @@
 package com.project.bookreviewapp.controller;
 
+import java.util.List;
+
 import javax.naming.AuthenticationException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,9 +20,13 @@ import com.project.bookreviewapp.auth.AssignRole;
 import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
+import com.project.bookreviewapp.entity.AuthorDetail;
+import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.service.AuthorDetailService;
 import com.project.bookreviewapp.service.implementation.AuthenticationServiceImpl;
 import com.project.bookreviewapp.utils.ApiResponse;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final AuthenticationServiceImpl authenticationService;
+    private final AuthorDetailService authorDetailService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> register(@RequestBody @Valid RegisterRequest request) {
@@ -52,6 +62,62 @@ public class UserController {
             apiResponse = new ApiResponse<>("error was thrown server error", 500, null);
             return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsers(@RequestHeader("Authorization") String token) {
+        ApiResponse<List<User>> apiResponse;
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            apiResponse = new ApiResponse<>("Token is missing or invalid", 400, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            apiResponse = new ApiResponse<>("all users fetched successfully", 200,
+                    authenticationService.getAllUsers(token));
+        } catch (AuthenticationException ex) {
+            apiResponse = new ApiResponse<>(ex.getMessage(), 403);
+            return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            apiResponse = new ApiResponse<>("An error occurred on the server", 500);
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponse<String>> deleteUserById(@PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+        ApiResponse<String> apiResponse;
+
+        // User foundedUser = authenticationService.findUserById(id);
+
+        AuthorDetail authorDetail = authorDetailService.findUserWithAuthorDetailsById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user detail with id " + id + "not found"));
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            apiResponse = new ApiResponse<>("Admin role on the Token is missing or invalid", 400, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            authorDetail.setUser(null);
+            authorDetailService.createAuthorDetail(authorDetail);
+            authenticationService.deleteUserById(id, token);
+            apiResponse = new ApiResponse<>("Deleted user successfully", 404);
+        } catch (AuthenticationException ex) {
+            apiResponse = new ApiResponse<>(ex.getMessage(), 403);
+            return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            apiResponse = new ApiResponse<>("An error occurred on the server", 500);
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

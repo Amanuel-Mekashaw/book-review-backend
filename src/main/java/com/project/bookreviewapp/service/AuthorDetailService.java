@@ -18,4 +18,6 @@ public interface AuthorDetailService {
 
     public Optional<AuthorDetail> getUserDetailByAuthorId(Long authorId);
 
+    public Optional<AuthorDetail> findUserWithAuthorDetailsById(Long id);
+
 }

@@ -1,5 +1,6 @@
 package com.project.bookreviewapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -48,7 +49,7 @@ public class Book {
     private String isbn;
 
     @JsonView(BookAuthorView.Summary.class)
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "CLOB")
     private String description;
 
     @Column(name = "published_year")

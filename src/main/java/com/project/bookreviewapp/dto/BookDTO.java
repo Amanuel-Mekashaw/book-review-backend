@@ -24,7 +24,7 @@ public class BookDTO {
     private String isbn;
 
     @NotBlank(message = "provide atleast a brief details about the book")
-    @Size(max = 700, message = "Description can't be greater than 700 letter")
+    @Size(max = 1000, message = "Description can't be greater than 700 letter")
     private String description;
 
     @NotNull(message = "Author id cannot be null")

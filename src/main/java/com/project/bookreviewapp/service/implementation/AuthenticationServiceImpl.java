@@ -2,9 +2,12 @@ package com.project.bookreviewapp.service.implementation;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import javax.naming.AuthenticationException;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.AuthenticationService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,6 +97,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         repository.save(user);
 
         log.info("Role {} assigned to user {}", newRole, username);
+    }
+
+    @Override
+    public List<User> getAllUsers(String token) throws Exception {
+        List<User> users = repository.findAll();
+        return users;
+    }
+
+    @Override
+    public void deleteUserById(Long id, String token) throws Exception {
+        try {
+            String requesterRole = jwtService.extractRole(token.replace("Bearer ", ""));
+
+            if (!"ADMIN".equalsIgnoreCase(requesterRole)) {
+                throw new AccessDeniedException("Only ADMIN can delete users.");
+            } else {
+                repository.deleteById(id);
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            log.debug("user with " + id + " doesn't exist\n\n" + ex.getMessage());
+        }
+    }
+
+    @Override
+    public User findUserById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user with id " + id + "not found"));
     }
 
 }

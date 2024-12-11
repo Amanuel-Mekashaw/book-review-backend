@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
 import com.project.bookreviewapp.entity.Book;
 
@@ -28,4 +29,8 @@ public interface BookService {
     List<Book> getAllBooksWithGenres();
 
     Page<Book> findBookByTitle(String title, Pageable pageable);
+
+    List<Book> findBookByUserId(Long userId);
+
+    List<Book> findBooksByAuthorFirstNameOrLastName(String firstName, String lastName);
 }
