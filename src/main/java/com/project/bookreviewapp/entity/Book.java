@@ -3,6 +3,8 @@ package com.project.bookreviewapp.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.bookreviewapp.dto.BookAuthorView;
 import jakarta.persistence.CascadeType;
@@ -14,12 +16,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +53,7 @@ public class Book {
     private String isbn;
 
     @JsonView(BookAuthorView.Summary.class)
-    @Column(columnDefinition = "CLOB")
+
     private String description;
 
     @Column(name = "published_year")
@@ -76,11 +80,11 @@ public class Book {
     @JsonView(BookAuthorView.Summary.class)
     private List<Genre> genres;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "book_collection", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "collection_id"))
-    @JsonIgnore
-    @JsonView(BookAuthorView.Summary.class)
-    private List<Collection> collections;
+    @JsonBackReference
+    // @JsonView(BookAuthorView.Detailed.class)
+    private List<Collection> collections = new ArrayList<>();
 
     @Column(name = "cover_image")
     @JsonView(BookAuthorView.Summary.class)

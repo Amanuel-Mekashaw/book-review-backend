@@ -94,10 +94,7 @@ public class UserController {
             @RequestHeader("Authorization") String token) {
         ApiResponse<String> apiResponse;
 
-        // User foundedUser = authenticationService.findUserById(id);
-
-        AuthorDetail authorDetail = authorDetailService.findUserWithAuthorDetailsById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user detail with id " + id + "not found"));
+        AuthorDetail authorDetail = authorDetailService.findUserWithAuthorDetailsById(id).orElse(null);
 
         if (token == null || !token.startsWith("Bearer ")) {
             apiResponse = new ApiResponse<>("Admin role on the Token is missing or invalid", 400, null);
@@ -107,8 +104,10 @@ public class UserController {
         try {
             authorDetail.setUser(null);
             authorDetailService.createAuthorDetail(authorDetail);
+
             authenticationService.deleteUserById(id, token);
-            apiResponse = new ApiResponse<>("Deleted user successfully", 404);
+            apiResponse = new ApiResponse<>("Deleted user successfully", 200);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } catch (AuthenticationException ex) {
             apiResponse = new ApiResponse<>(ex.getMessage(), 403);
             return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
@@ -116,8 +115,6 @@ public class UserController {
             apiResponse = new ApiResponse<>("An error occurred on the server", 500);
             return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

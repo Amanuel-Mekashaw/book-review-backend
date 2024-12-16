@@ -26,7 +26,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.genres WHERE b.author IS NULL OR b.author = b.author")
     List<Book> findAllWithGenres();
 
-    @Query("SELECT DISTINCT b FROM Book b JOIN b.genres g WHERE g.id=:genreId")
+    @Query("SELECT b FROM Book b JOIN b.genres g WHERE g.id=:genreId")
     List<Book> findBooksByGenreId(@Param("genreId") Long genreId);
 
     Page<Book> findByTitleContainingIgnoreCase(String title, Pageable pageable);

@@ -11,6 +11,8 @@ import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.CollectionService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
@@ -38,11 +40,16 @@ public class CollectionController {
         this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Get all collection", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
-    public ResponseEntity<Page<Collection>> getAllCollection(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<Collection>>> getAllCollection(
+            @PageableDefault(size = 10) Pageable pageable) {
         Page<Collection> collections = collectionService.getAllCollection(pageable);
 
-        return new ResponseEntity<>(collections, HttpStatus.OK);
+        ApiResponse<Page<Collection>> apiResponse = new ApiResponse<>("Collection retrieved successfully", 200,
+                collections);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -93,6 +100,7 @@ public class CollectionController {
         if (foundCollection != null && foundUser != null) {
             foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
             foundCollection.setId(id);
+            foundCollection.setCreatedAt(foundCollection.getCreatedAt());
             foundCollection = collectionService.saveCollection(foundCollection);
 
             apiResponse = new ApiResponse<>("collection updated successfully", 200, foundCollection);
@@ -106,9 +114,10 @@ public class CollectionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteCollection(@PathVariable Long id) {
+
         collectionService.deleteCollection(id);
-        ApiResponse<String> apiResponse = new ApiResponse<>("collection deleted successfully", 404);
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        ApiResponse<String> apiResponse = new ApiResponse<>("collection deleted successfully", 200);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{collectionId}/books/{bookId}")

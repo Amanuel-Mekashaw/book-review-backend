@@ -58,7 +58,7 @@ public class AuthorDetailServiceImpl implements AuthorDetailService {
 
     @Override
     public Optional<AuthorDetail> findUserWithAuthorDetailsById(Long id) {
-        return authorDetailRepository.findUserWithAuthorDetailsById(id);
+        return authorDetailRepository.findUserDetailByAuthorId(id);
     }
 
 }

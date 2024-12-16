@@ -182,6 +182,23 @@ public class BookController {
         }
     }
 
+    @Operation(summary = "update rating of a book", security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/rating/{id}")
+    public ResponseEntity<ApiResponse<String>> updateBookRating(@RequestBody @Valid Long rating,
+            @PathVariable Long id) {
+        Book foundBook = bookService.getBookById(id);
+        ApiResponse<String> apiResponse;
+        if (foundBook != null) {
+            foundBook.setAverageRating(rating);
+            foundBook = bookService.saveBook(foundBook);
+            apiResponse = new ApiResponse<String>("Rating Updated successfully", 200, "");
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<String>("Rating didn't Updated ", 401, "");
+            return new ResponseEntity<ApiResponse<String>>(apiResponse, HttpStatus.OK);
+        }
+    }
+
     @Operation(summary = "delete a book", security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteBook(@PathVariable Long id) throws Exception {

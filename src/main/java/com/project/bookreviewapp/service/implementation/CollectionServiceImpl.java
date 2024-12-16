@@ -12,6 +12,7 @@ import com.project.bookreviewapp.repository.CollectionRepository;
 import com.project.bookreviewapp.service.CollectionService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -32,6 +33,7 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
     public Collection getCollection(Long id) {
         return collectionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Collection by this id not found"));
@@ -44,8 +46,17 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void deleteCollection(Long id) {
+
         try {
-            collectionRepository.deleteById(id);
+            Collection collection = collectionRepository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("Collection with id of " + id + " Not found"));
+            if (collection != null) {
+                for (Book book : collection.getBooks()) {
+                    book.getCollections().remove(collection);
+                }
+                // Delete the collection after removing references
+                collectionRepository.delete(collection);
+            }
         } catch (EmptyResultDataAccessException ex) {
             log.debug("no collection with this id" + id + " can be found.", ex.getMessage());
         }

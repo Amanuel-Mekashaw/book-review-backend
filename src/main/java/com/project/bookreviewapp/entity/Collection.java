@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,12 +45,12 @@ public class Collection {
 
     private String description;
 
-    @ManyToMany(mappedBy = "collections")
-    @JsonBackReference
+    @ManyToMany(mappedBy = "collections", fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Book> books;
 
     // TODO uncomment this shit
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;

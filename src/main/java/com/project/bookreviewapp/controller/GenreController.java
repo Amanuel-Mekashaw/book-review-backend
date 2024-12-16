@@ -39,7 +39,7 @@ public class GenreController {
 
     @GetMapping
     @JsonView(GenreView.Summary.class)
-    public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 20) Pageable pageable) {
         Page<Genre> genres = genreService.getAllGenre(pageable);
         return new ResponseEntity<Page<Genre>>(genres, HttpStatus.OK);
     }

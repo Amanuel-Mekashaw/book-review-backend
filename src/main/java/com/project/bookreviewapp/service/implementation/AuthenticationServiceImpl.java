@@ -26,6 +26,8 @@ import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
 import com.project.bookreviewapp.config.JwtService;
+import com.project.bookreviewapp.entity.AuthorDetail;
+import com.project.bookreviewapp.entity.Collection;
 import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.entity.User.Role;
 import com.project.bookreviewapp.entity.User.Status;
@@ -113,7 +115,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if (!"ADMIN".equalsIgnoreCase(requesterRole)) {
                 throw new AccessDeniedException("Only ADMIN can delete users.");
             } else {
-                repository.deleteById(id);
+                User user = repository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("User by this id: " + id + " Not found"));
+
+                if (user != null) {
+                    // remove author detail info
+                    user.setAuthorDetails(null);
+                    // remove collection where the author is referenced
+                    for (Collection collection : user.getCollections()) {
+                        user.getCollections().remove(collection);
+                    }
+                    repository.deleteById(id);
+                }
+
             }
         } catch (EmptyResultDataAccessException ex) {
             log.debug("user with " + id + " doesn't exist\n\n" + ex.getMessage());
