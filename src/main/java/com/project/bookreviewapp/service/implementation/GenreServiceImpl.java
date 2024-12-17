@@ -1,5 +1,6 @@
 package com.project.bookreviewapp.service.implementation;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -50,6 +51,11 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public boolean isGenreExist(Genre genre) {
         return genreRepository.existsById(genre.getId());
+    }
+
+    @Override
+    public List<Genre> listAllGenre() {
+        return genreRepository.findAll();
     }
 
 }

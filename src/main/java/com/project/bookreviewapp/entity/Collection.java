@@ -49,7 +49,6 @@ public class Collection {
     @JsonManagedReference
     private List<Book> books;
 
-    // TODO uncomment this shit
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference

@@ -1,6 +1,7 @@
 package com.project.bookreviewapp.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,11 +38,18 @@ public class GenreController {
         this.genreService = genreService;
     }
 
-    @GetMapping
+    @GetMapping("/paginate")
     @JsonView(GenreView.Summary.class)
-    public ResponseEntity<Page<Genre>> listAllGenre(@PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<Page<Genre>> listAllGenrePaginate(@PageableDefault(size = 20) Pageable pageable) {
         Page<Genre> genres = genreService.getAllGenre(pageable);
         return new ResponseEntity<Page<Genre>>(genres, HttpStatus.OK);
+    }
+
+    @GetMapping
+    @JsonView(GenreView.Summary.class)
+    public ResponseEntity<List<Genre>> listAllGenre() {
+        List<Genre> genres = genreService.listAllGenre();
+        return new ResponseEntity<List<Genre>>(genres, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -87,9 +95,21 @@ public class GenreController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteGenre(@PathVariable Long id) {
-        genreService.deleteGenre(id);
-        ApiResponse<String> apiResponse = new ApiResponse<>("genre deleted successfully", 404);
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        ApiResponse<String> apiResponse;
+        Genre genre = genreService.getGenre(id)
+                .orElseThrow(() -> new EntityNotFoundException("Genre not found with id" + id));
+
+        if (genre != null) {
+
+            genre.setBooks(null);
+            genreService.deleteGenre(id);
+            apiResponse = new ApiResponse<>("genre deleted successfully", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<>("genre not found", 404, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+
     }
 
 }

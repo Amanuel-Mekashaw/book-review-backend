@@ -1,5 +1,6 @@
 package com.project.bookreviewapp.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,8 @@ public interface GenreService {
     Optional<Genre> getGenre(Long id);
 
     Page<Genre> getAllGenre(Pageable pageable);
+
+    List<Genre> listAllGenre();
 
     Genre createGenre(Genre genre);
 
