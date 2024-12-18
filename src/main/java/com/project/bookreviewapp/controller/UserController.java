@@ -26,7 +26,6 @@ import com.project.bookreviewapp.service.AuthorDetailService;
 import com.project.bookreviewapp.service.implementation.AuthenticationServiceImpl;
 import com.project.bookreviewapp.utils.ApiResponse;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

@@ -3,8 +3,6 @@ package com.project.bookreviewapp.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.bookreviewapp.dto.BookAuthorView;
 import jakarta.persistence.CascadeType;
@@ -16,12 +14,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,16 +83,20 @@ public class Book {
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "book_collection", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "collection_id"))
     @JsonBackReference
-    // @JsonView(BookAuthorView.Detailed.class)
     private List<Collection> collections = new ArrayList<>();
 
     @Column(name = "cover_image")
     @JsonView(BookAuthorView.Summary.class)
     private String coverImage;
 
-    @Column(name = "average_rating")
+    @OneToMany(mappedBy = "book")
+    @JsonIgnore
+    private List<Rating> ratings; // List of ratings for the book
+
     @JsonView(BookAuthorView.Summary.class)
-    private double averageRating;
+    @Transient // gets Calculated dynamically
+    @Column(name = "average_rating")
+    private double averageRating; // Calculated dynamically
 
     @Column(name = "rating_count")
     @JsonView(BookAuthorView.Summary.class)
@@ -119,6 +123,14 @@ public class Book {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // calculate average rating dynamically
+    public double getAverageRating() {
+        if (ratings == null || ratings.isEmpty()) {
+            return 0.0;
+        }
+        return ratings.stream().mapToInt(Rating::getRatingValue).average().orElse(0.0);
     }
 
     public void addCollection(Collection collection) {

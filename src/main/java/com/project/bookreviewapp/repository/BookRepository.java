@@ -18,11 +18,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.genres WHERE b.id = :id")
     Optional<Book> findByIdWithGenres(@Param("id") Long id);
 
-    // @Query("SELECT b FROM Book b JOIN FETCH b.genres")
-
-    // @Query("SELECT new com.project.bookreviewapp.dto.BookDTO(b.id, b.title,
-    // b.isbn, b.description, b.publishedYear, b.publisher, b.pages, b.language,
-    // b.genres, b.coverImage) "
     @Query("SELECT b FROM Book b LEFT JOIN FETCH b.genres WHERE b.author IS NULL OR b.author = b.author")
     List<Book> findAllWithGenres();
 
@@ -31,12 +26,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
+    List<Book> findByGenres_NameIgnoreCase(String genre);
+
     @Query("SELECT b FROM Book b " + "JOIN b.author u " + "WHERE u.id = :userId")
     List<Book> findBooksByUserId(@Param("userId") Long userId);
-
-    // @Query("SELECT b FROM Book b " + "JOIN b.user u " + "JOIN u.authorDetail ad "
-    // + "WHERE ad.firstName = :firstName "
-    // + "OR ad.lastName = :lastName")
 
     @Query("SELECT b FROM Book b JOIN b.author u JOIN u.authorDetails ad "
             + "WHERE ad.firstName = :firstName OR ad.lastName = :lastName")
