@@ -41,6 +41,9 @@ public class Rating {
     @Column(name = "rating_value")
     private int ratingValue;
 
+    @Column(name = "rating_comment", nullable = true)
+    private String comment;
+
     @CreatedDate
     @Column(name = "created_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

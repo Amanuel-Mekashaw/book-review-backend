@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.bookreviewapp.dto.RatingDTO;
 import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.repository.BookRepository;
@@ -14,7 +15,9 @@ import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.RatingService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/bookrating")
@@ -47,6 +50,25 @@ public class RatingController {
             apiResponse = new ApiResponse<>("Rating failed", 401, null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         }
+    }
 
+    @PostMapping("/ratecomment")
+    public ResponseEntity<ApiResponse<String>> rateAndCommentOnBook(@RequestBody() @Valid RatingDTO ratingDTO) {
+
+        ApiResponse<String> apiResponse;
+
+        User user = userRepository.findById(ratingDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        Book book = bookRepository.findById(ratingDTO.getBookId())
+                .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+
+        if (user != null && book != null) {
+            apiResponse = new ApiResponse<>("Rating submitted successfully", 200, null);
+            ratingService.addRatingAndComment(user, book, ratingDTO.getRatingValue(), ratingDTO.getComment());
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<>("Rating failed", 401, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
     }
 }
