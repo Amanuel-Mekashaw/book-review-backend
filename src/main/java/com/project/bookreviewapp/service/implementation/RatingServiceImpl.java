@@ -1,5 +1,7 @@
 package com.project.bookreviewapp.service.implementation;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.project.bookreviewapp.dto.RatingDTO;
@@ -54,6 +56,16 @@ public class RatingServiceImpl implements RatingService {
             newRating.setComment(comment);
             ratingRepository.save(newRating);
         }
+    }
+
+    @Override
+    public List<Rating> getAllRatingsByBook(Book book) {
+        return ratingRepository.findByBook(book);
+    }
+
+    @Override
+    public List<Rating> getRatingsByBookIdAndValue(Long bookId, int ratingValue) {
+        return ratingRepository.findByBookIdAndRatingValue(bookId, ratingValue);
     }
 
 }

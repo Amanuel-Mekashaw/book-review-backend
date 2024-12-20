@@ -1,7 +1,7 @@
 package com.project.bookreviewapp.dto;
 
-import io.micrometer.common.lang.Nullable;
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,19 +13,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RatingDTO {
 
-    @NotNull(message = "bookId cannot be null")
-    @NotBlank
+    @JsonProperty("bookId")
+    @NotNull
     private Long bookId;
 
-    @NotNull(message = "userId cannot be null")
-    @NotBlank
+    @JsonProperty("userId")
+    @NotNull
     private Long userId;
 
-    @NotNull(message = "rating value cannot be null")
-    @NotBlank
-    private int ratingValue;
+    @JsonProperty("ratingValue")
+    @NotNull
+    private Integer ratingValue;
 
+    @JsonProperty("comment")
     @Size(max = 255, message = "maximum of 255 character")
     private String comment;
-
 }

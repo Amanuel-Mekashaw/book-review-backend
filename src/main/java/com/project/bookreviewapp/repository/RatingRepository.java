@@ -14,5 +14,8 @@ import com.project.bookreviewapp.entity.User;
 public interface RatingRepository extends JpaRepository<Rating, Long> {
     List<Rating> findByBook(Book book);
 
+    List<Rating> findByBookIdAndRatingValue(Long bookId, int ratingValue);
+
     Optional<Rating> findByUserAndBook(User user, Book book);
+
 }
