@@ -1,6 +1,9 @@
 package com.project.bookreviewapp.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bookreviewapp.dto.BookAuthorView;
 import com.project.bookreviewapp.dto.BookDTO;
 import com.project.bookreviewapp.entity.Book;
@@ -34,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/books")
@@ -53,7 +57,7 @@ public class BookController {
     @Operation(summary = "Get all books", security = @SecurityRequirement(name = "bearerAuth"))
     @JsonView(BookAuthorView.Summary.class)
     @GetMapping
-    public ResponseEntity<Page<Book>> listAllBooks(@PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<Page<Book>> listAllBooks(@PageableDefault(size = 30) Pageable pageable) {
         Page<Book> books = bookService.getAllBooks(pageable);
         return new ResponseEntity<Page<Book>>(books, HttpStatus.OK);
     }
@@ -125,6 +129,21 @@ public class BookController {
     public ResponseEntity<List<Book>> getAllBooksWithGenres() {
         List<Book> books = bookService.getAllBooksWithGenres();
         return ResponseEntity.ok(books);
+    }
+
+    @Operation(summary = "Create book using book cover file", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/bycover")
+    public ResponseEntity<ApiResponse<String>> addNewBook(@RequestParam("book") String bookDto,
+            @RequestParam("coverImage") MultipartFile coverImage) throws JsonMappingException, JsonProcessingException {
+
+        ApiResponse<String> apiResponse;
+
+        BookDTO bookRequest = new ObjectMapper().readValue(bookDto, BookDTO.class);
+        System.out.println("\n\n\n" + bookRequest + "\n\n\n");
+        bookService.addNewBook(bookRequest, coverImage);
+        apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+
     }
 
     @Operation(summary = "create a book", security = @SecurityRequirement(name = "bearerAuth"))

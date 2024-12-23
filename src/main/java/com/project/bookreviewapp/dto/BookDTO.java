@@ -3,6 +3,9 @@ package com.project.bookreviewapp.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,6 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BookDTO {
 
     private Long id;
@@ -40,6 +44,9 @@ public class BookDTO {
 
     private String coverImage;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    // private LocalDateTime createdAt;
+
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    // private LocalDateTime updatedAt;
 }

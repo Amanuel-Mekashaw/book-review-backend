@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.project.bookreviewapp.dto.BookDTO;
 import com.project.bookreviewapp.entity.Book;
 
 public interface BookService {
@@ -33,4 +34,6 @@ public interface BookService {
     List<Book> findBookByUserId(Long userId);
 
     List<Book> findBooksByAuthorFirstNameOrLastName(String firstName, String lastName);
+
+    void addNewBook(BookDTO bookRequest, MultipartFile coverImage);
 }
