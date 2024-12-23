@@ -21,7 +21,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "EKO/tIYyoEPEhNIEE0yvxs0dlhYtDL5gTKbRvOdJk6E=";
+    private static final String SECRET_KEY = "EKO/tIYyoEPEhNIEE0yvxs0dlhYtDL5gTKbRvOdJk6E=";// EKO/tIYyoEPEhNIEE0yvxs0dlhYtDL5gTKbRvOdJk6E=
     private static final long EXPIRATION_TIME_MS = 5 * 24 * 60 * 60 * 1000; // 5 days in milliseconds
 
     public String extractUsername(String token) {
