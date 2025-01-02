@@ -18,7 +18,6 @@ import com.project.bookreviewapp.entity.Rating;
 import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.repository.BookRepository;
 import com.project.bookreviewapp.repository.UserRepository;
-import com.project.bookreviewapp.service.BookService;
 import com.project.bookreviewapp.service.RatingService;
 import com.project.bookreviewapp.utils.ApiResponse;
 

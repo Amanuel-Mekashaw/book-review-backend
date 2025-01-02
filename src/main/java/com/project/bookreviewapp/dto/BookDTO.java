@@ -1,9 +1,7 @@
 package com.project.bookreviewapp.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +41,7 @@ public class BookDTO {
     private List<Long> genreIds; // List of genre IDs
 
     private String coverImage;
+    // private String document;
 
     // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     // private LocalDateTime createdAt;

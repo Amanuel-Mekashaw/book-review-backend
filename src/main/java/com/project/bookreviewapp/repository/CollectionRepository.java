@@ -11,4 +11,11 @@ import com.project.bookreviewapp.entity.Collection;
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findAllById(Iterable<Long> ids);
 
+
+    // Fetch private collections for a specific user
+    List<Collection> findByUser_IdAndIsPrivate(Long userId, boolean isPrivate);
+
+    // Fetch all public collections
+    List<Collection> findByIsPrivate(boolean isPrivate);
+
 }

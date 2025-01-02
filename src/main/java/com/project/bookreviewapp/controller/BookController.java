@@ -146,6 +146,47 @@ public class BookController {
 
     }
 
+    @Operation(summary = "Update book using book cover file", security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/bycover/{id}")
+    public ResponseEntity<ApiResponse<Book>> updateExistingBook(@PathVariable() Long id,
+            @RequestParam("book") String bookDto, @RequestParam("coverImage") MultipartFile coverImage)
+            throws JsonMappingException, JsonProcessingException {
+
+        ApiResponse<Book> apiResponse;
+        BookDTO bookRequest = new ObjectMapper().readValue(bookDto, BookDTO.class);
+
+        // get book by id
+        Book foundBook = bookService.getBookById(id);
+
+        // get user by id
+        User foundAuthor = userRepository.findById(bookRequest.getAuthorId())
+                .orElseThrow(() -> new EntityNotFoundException("user by " + bookRequest.getAuthorId() + " not found"));
+
+        // get the genres by id
+        List<Genre> genres = genreRepository.findAllById(bookRequest.getGenreIds());
+        if (genres.size() != bookRequest.getGenreIds().size()) {
+            throw new EntityNotFoundException("One or more genres not found");
+        }
+
+        if (foundBook != null && foundAuthor != null) {
+            foundBook = BookMapper.bookDtoToBook(bookRequest, userRepository, genreRepository);
+            foundBook.setId(id);
+            if (foundBook.getCreatedAt() == null) {
+                foundBook.setCreatedAt(LocalDateTime.now());
+            }
+            foundBook.setCreatedAt(foundBook.getCreatedAt());
+            foundBook.setGenres(genres);
+            bookService.addNewBook(bookRequest, coverImage);
+
+            apiResponse = new ApiResponse<Book>("book updated successfully", 200, foundBook);
+            return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<Book>("book didn't update", 404, null);
+            return new ResponseEntity<ApiResponse<Book>>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+
+    }
+
     @Operation(summary = "create a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     public ResponseEntity<ApiResponse<Book>> createBook(@RequestBody @Valid BookDTO bookDTO) {
@@ -224,6 +265,6 @@ public class BookController {
         bookService.deleteBook(id);
         ApiResponse<String> apiResponse = new ApiResponse<>("Deleted book with isbn " + id, 404);
 
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

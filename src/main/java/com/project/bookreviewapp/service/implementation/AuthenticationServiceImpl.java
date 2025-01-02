@@ -3,7 +3,6 @@ package com.project.bookreviewapp.service.implementation;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import javax.naming.AuthenticationException;
 
@@ -15,22 +14,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.bookreviewapp.auth.AuthenticationRequest;
+import com.project.bookreviewapp.auth.AuthenticationResponse;
+import com.project.bookreviewapp.auth.RegisterRequest;
+import com.project.bookreviewapp.config.JwtService;
+import com.project.bookreviewapp.entity.Collection;
+import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Role;
+import com.project.bookreviewapp.entity.User.Status;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.AuthenticationService;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.project.bookreviewapp.auth.AuthenticationRequest;
-import com.project.bookreviewapp.auth.AuthenticationResponse;
-import com.project.bookreviewapp.auth.RegisterRequest;
-import com.project.bookreviewapp.config.JwtService;
-import com.project.bookreviewapp.entity.AuthorDetail;
-import com.project.bookreviewapp.entity.Collection;
-import com.project.bookreviewapp.entity.User;
-import com.project.bookreviewapp.entity.User.Role;
-import com.project.bookreviewapp.entity.User.Status;
 
 @Service
 @Slf4j

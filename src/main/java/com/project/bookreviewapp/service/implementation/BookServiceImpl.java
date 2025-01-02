@@ -6,13 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.bookreviewapp.dto.BookDTO;
 import com.project.bookreviewapp.entity.Book;
-import com.project.bookreviewapp.entity.Genre;
-import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.mapper.BookMapper;
 import com.project.bookreviewapp.repository.BookRepository;
 import com.project.bookreviewapp.repository.GenreRepository;
+import com.project.bookreviewapp.repository.RatingRepository;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.BookService;
 
@@ -39,11 +35,11 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private UserRepository userRepository;
     private GenreRepository genreRepository;
+    private RatingRepository ratingRepository;
 
-    private static final String STORAGE_DIRECTORY = "C:\\projects\\book review app\\Frontend\\bookreviewapp\\public\\book_images";
+    private static final String STORAGE_DIRECTORY = "D:\\test\\book_images";
 
     private static final long MAX_FILE_SIZE_MB = 4 * 1024 * 1024; // 4MB
-    private static final List<String> SUPPORTED_FILE_TYPES = List.of("png", "jpeg", "jpg", "webp");
 
     public BookServiceImpl(BookRepository bookRepository, UserRepository userRepository,
             GenreRepository genreRepository) {
@@ -79,7 +75,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(Long id) throws Exception {
         try {
-            bookRepository.deleteById(id);
+            Book book = bookRepository.findById(id).orElse(null);
+
+            if (book != null) {
+                bookRepository.deleteById(id);
+            }
+
         } catch (EmptyResultDataAccessException ex) {
             log.debug("book with " + id + " doesn't exist" + ex.getMessage());
         }
@@ -143,11 +144,6 @@ public class BookServiceImpl implements BookService {
 
         String extension = FilenameUtils.getExtension(originalFilename);
         System.out.println("\n\n\nExension" + extension);
-
-        // if (!SUPPORTED_FILE_TYPES.contains(extension)) {
-        // throw new IllegalArgumentException("Unsupported file type. Only PNG, JPEG,
-        // and WEBP are allowed");
-        // }
 
         String filename = UUID.randomUUID().toString() + "." + extension;
 

@@ -1,7 +1,6 @@
 package com.project.bookreviewapp.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;

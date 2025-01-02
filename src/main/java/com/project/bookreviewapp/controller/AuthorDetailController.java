@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bookreviewapp.dto.AuthorDetailDTO;
 import com.project.bookreviewapp.entity.AuthorDetail;
 import com.project.bookreviewapp.entity.User;
@@ -19,6 +24,8 @@ import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.AuthorDetailService;
 import com.project.bookreviewapp.utils.ApiResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
@@ -80,18 +87,66 @@ public class AuthorDetailController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
+    // create user detail using profile image
+    @Operation(summary = "create a user detail using book profile photo image file", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/byprofile")
+    public ResponseEntity<ApiResponse<String>> createAuthorDetail(@RequestParam("userDetail") String authorDetail,
+            @RequestParam("profilePhoto") MultipartFile profilePhoto)
+            throws JsonMappingException, JsonProcessingException {
+        ApiResponse<String> apiResponse;
+
+        AuthorDetailDTO authorDetailDTO = new ObjectMapper().readValue(authorDetail, AuthorDetailDTO.class);
+
+        authorDetailService.addNewUserDetail(authorDetailDTO, profilePhoto);
+
+        apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+    // create user detail using profile image
+    @Operation(summary = "update existing user detail using book profile photo image file", security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/byprofile/{id}")
+    public ResponseEntity<ApiResponse<AuthorDetail>> updateExistingUserDetail(@PathVariable() Long id,
+            @RequestParam("userDetail") String authorDetail, @RequestParam("profilePhoto") MultipartFile profilePhoto)
+            throws JsonMappingException, JsonProcessingException {
+
+        ApiResponse<AuthorDetail> apiResponse;
+
+        AuthorDetailDTO authorDetailDTO = new ObjectMapper().readValue(authorDetail, AuthorDetailDTO.class);
+
+        AuthorDetail foundAuthorDetail = authorDetailService.getAuthorDetail(id)
+                .orElseThrow(() -> new EntityNotFoundException("no author detail found by this id " + id));
+
+        User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
+                () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
+
+        if (user != null && foundAuthorDetail != null) {
+            foundAuthorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO, userRepository);
+            foundAuthorDetail.setId(id);
+            // foundAuthorDetail.setUser(user);
+            authorDetailService.addNewUserDetail(authorDetailDTO, profilePhoto);
+
+            apiResponse = new ApiResponse<>("Author detail updated successfully", 201, foundAuthorDetail);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<AuthorDetail>("can't update user detail", 404, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<AuthorDetail>> createAuthorDetail(
             @RequestBody @Valid AuthorDetailDTO authorDetailDTO) {
         User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
 
-        AuthorDetail authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
+        AuthorDetail authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO, userRepository);
 
         ApiResponse<AuthorDetail> apiResponse;
         if (user != null) {
             // user.setAuthorDetails(authorDetail);
-            authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
+            authorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO, userRepository);
             authorDetail.setUser(user);
             authorDetail = authorDetailService.createAuthorDetail(authorDetail);
 
@@ -119,7 +174,7 @@ public class AuthorDetailController {
         ApiResponse<AuthorDetail> apiResponse;
 
         if (user != null && foundAuthorDetail != null) {
-            foundAuthorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO);
+            foundAuthorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO, userRepository);
             foundAuthorDetail.setId(id);
             // foundAuthorDetail.setUser(user);
             foundAuthorDetail = authorDetailService.createAuthorDetail(foundAuthorDetail);

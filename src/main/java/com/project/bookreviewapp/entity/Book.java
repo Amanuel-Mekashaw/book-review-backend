@@ -1,10 +1,18 @@
 package com.project.bookreviewapp.entity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.project.bookreviewapp.dto.BookAuthorView;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,16 +29,10 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Entity
@@ -89,7 +91,16 @@ public class Book {
     @JsonView(BookAuthorView.Summary.class)
     private String coverImage;
 
-    @OneToMany(mappedBy = "book")
+    // // TODO Make the document upload system
+    // @Column(name = "document")
+    // @JsonView(BookAuthorView.Summary.class)
+    // private String document;
+
+    public String getCoverImageUrl() {
+        return "/api/v1/images/book_images/" + coverImage;
+    }
+
+    @OneToMany(mappedBy = "book", cascade = { CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.REFRESH })
     @JsonIgnore
     private List<Rating> ratings; // List of ratings for the book
 
@@ -144,6 +155,13 @@ public class Book {
         if (collections.contains(collection)) {
             collections.remove(collection);
             collection.getBooks().remove(this);
+        }
+    }
+
+    public void removeRating(Rating rating) {
+        if (ratings.contains(rating)) {
+            ratings.remove(rating);
+            rating.setBook(null);
         }
     }
 

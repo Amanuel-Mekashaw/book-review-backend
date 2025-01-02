@@ -1,5 +1,7 @@
 package com.project.bookreviewapp.service.implementation;
 
+import java.util.List;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,11 +70,16 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
     public void addBookToCollection(Long bookId, Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new RuntimeException("Collection not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
 
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found"));
+
+        if (collection.getBooks().contains(book)) {
+            throw new IllegalArgumentException("Book already exists in the collection");
+        }
 
         collection.addBook(book);
 
@@ -80,14 +87,28 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
     public void removeBookFromCollection(Long bookId, Long collectionId) {
         Collection collection = collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new RuntimeException("Collection not found"));
 
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
-
+        
+        if (!collection.getBooks().contains(book)) {
+            throw new IllegalArgumentException("Book does not exist in the collection");
+        }
         collection.removeBook(book);
         collectionRepository.save(collection);
+    }
+
+    @Override
+    public List<Collection> getPrivateCollection(Long userId) {
+        return collectionRepository.findByUser_IdAndIsPrivate(userId, true);
+    }
+
+    @Override
+    public List<Collection> getPublicCollection() {
+        return collectionRepository.findByIsPrivate(false);
     }
 
 }

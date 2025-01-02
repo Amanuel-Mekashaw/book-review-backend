@@ -39,6 +39,10 @@ public class AuthorDetail {
     @Column(name = "profile_picture")
     private String profilePicture;
 
+    public String getProfilePicture() {
+        return "/api/v1/images/profile_images/" + profilePicture;
+    }
+
     private String biography;
 
     @ElementCollection

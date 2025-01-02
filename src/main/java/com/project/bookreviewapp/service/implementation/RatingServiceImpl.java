@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.project.bookreviewapp.dto.RatingDTO;
 import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.Rating;
 import com.project.bookreviewapp.entity.User;

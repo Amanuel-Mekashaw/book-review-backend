@@ -25,13 +25,13 @@ public class AuthorDetailDTO {
     @Size(max = 1000, message = "Biography must be less than or equal to 500 characters")
     private String biography;
 
-    @Size(min = 5, message = "profile picture must be grater than 5 characters")
+    // @Size(min = 5, message = "profile picture must be grater than 5 characters")
     private String profilePicture;
 
     @NotNull
     private Long userId;
 
-    @Size(max = 5, message = "There can be a maximum of 5 social links")
+    // @Size(max = 5, message = "There can be a maximum of 5 social links")
     private List<@Pattern(regexp = SocialLinkValidator.URL_PATTERN, message = "Invalid URL format for social link") String> socialLinks;
 
     public static class SocialLinkValidator {

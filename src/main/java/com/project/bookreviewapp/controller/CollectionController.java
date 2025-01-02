@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -57,6 +59,46 @@ public class CollectionController {
         return new ResponseEntity<>(collectionService.getCollection(id), HttpStatus.OK);
     }
 
+    @GetMapping("/private/{userId}")
+    public ResponseEntity<ApiResponse<List<Collection>>> getPrivateCollections(@PathVariable Long userId) {
+        ApiResponse<List<Collection>> apiResponse;
+
+        try {
+            List<Collection> privateCollections = collectionService.getPrivateCollection(userId);
+
+            if(privateCollections != null) {
+                apiResponse = new ApiResponse<>("Private Collection retrieved successfully", 200, privateCollections);
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }
+
+        } catch(Exception ex) {
+            apiResponse = new ApiResponse<>("Private Collection not found", 404, null);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+        return null;
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<ApiResponse<List<Collection>>> getPublicCollections() {
+        ApiResponse<List<Collection>> apiResponse;
+
+        try {
+            List<Collection> privateCollections = collectionService.getPublicCollection();
+
+            if(privateCollections != null) {
+                apiResponse = new ApiResponse<>("Public Collection retrieved successfully", 200, privateCollections);
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }
+
+        } catch(Exception ex) {
+            apiResponse = new ApiResponse<>("Private Collection not found", 404, null);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+        return null;
+    }
+
     @PostMapping("/{collectionId}/books/{bookId}")
     public ResponseEntity<ApiResponse<String>> addBookToCollection(@PathVariable @Valid Long collectionId,
             @PathVariable @Valid Long bookId) {
@@ -76,6 +118,8 @@ public class CollectionController {
     @PostMapping
     public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody @Valid CollectionDTO collectionDto) {
 
+        System.out.println("\n\n\n" + collectionDto + "\n\n\n");
+
         User foundAuthor = userRepository.findById(collectionDto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + collectionDto.getUserId() + " not found"));
 
@@ -86,6 +130,8 @@ public class CollectionController {
         ApiResponse<Collection> apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+
+
     }
 
     @PutMapping("/{id}")

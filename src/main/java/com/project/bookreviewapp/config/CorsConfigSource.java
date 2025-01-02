@@ -15,14 +15,14 @@ public class CorsConfigSource {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Your frontend origin
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
-                "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization",
-                "Content-Type"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+        // Register the configuration for the /images/** endpoint
+        source.registerCorsConfiguration("/api/v1/images/**", configuration);
         return source;
     }
 }

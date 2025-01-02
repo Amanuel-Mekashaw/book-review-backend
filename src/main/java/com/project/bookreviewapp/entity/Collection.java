@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -50,8 +51,13 @@ public class Collection {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"password", "passwordHash", "enabled","username", "accountNonExpired", "email", "accountNonLocked", "credentialsNonExpired", "authorities", "createdAt", "updatedAt", "authorDetails","status", "role" }) // Ignore specific fields from the User entity
     private User user;
+
+
+    @Column(name = "is_private", nullable = false)
+    private boolean isPrivate;
+
 
     @CreatedDate
     @Column(name = "created_at")

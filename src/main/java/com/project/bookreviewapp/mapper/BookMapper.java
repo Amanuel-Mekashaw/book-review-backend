@@ -9,7 +9,6 @@ import com.project.bookreviewapp.dto.BookDTO;
 import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.Genre;
 import com.project.bookreviewapp.entity.User;
-import com.project.bookreviewapp.repository.CollectionRepository;
 import com.project.bookreviewapp.repository.GenreRepository;
 import com.project.bookreviewapp.repository.UserRepository;
 

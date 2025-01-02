@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +62,7 @@ public class GenreController {
         return new ResponseEntity<Genre>(genre, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     @JsonView(GenreView.Summary.class)
     public ResponseEntity<ApiResponse<Genre>> createGenre(@RequestBody @Valid GenreDTO genreDTO) {
@@ -71,6 +73,7 @@ public class GenreController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
     @JsonView(GenreView.Summary.class)
     public ResponseEntity<ApiResponse<Genre>> updateGenre(@RequestBody @Valid GenreDTO genreDTO,

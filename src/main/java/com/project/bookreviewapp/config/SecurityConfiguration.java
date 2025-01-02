@@ -28,7 +28,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/assign-role", "/api/v1/auth/all", "/api/v1/auth/delete/**")
                         .hasAuthority("ADMIN").requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/authenticate", "/v3/api-docs/**",
-                                "/swagger-ui/**", "/swagger-ui.html")
+                                "/swagger-ui/**", "/swagger-ui.html", "/api/v1/images/**")
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
