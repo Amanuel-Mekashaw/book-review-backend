@@ -51,13 +51,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<Book> getAllBooks(Pageable pageable) {
         Page<Book> books = bookRepository.findAll(pageable);
-        // Append the storage path to the coverImage field for each book
-        // books.forEach(book -> {
-        // if (book.getCoverImage() != null) {
-        // book.setCoverImage(STORAGE_DIRECTORY + File.separator +
-        // book.getCoverImage());
-        // }
-        // });
         return books;
     }
 
@@ -160,6 +153,16 @@ public class BookServiceImpl implements BookService {
             throw new SecurityException("File not found or unsupported filename!");
         }
         return file;
+    }
+
+    @Override
+    public List<Book> filterBooksByLanguage(String language) {
+        return bookRepository.findByLanguage(language);
+    }
+
+    @Override
+    public List<Book> filterBooksByPublishedYear(int publishedYear) {
+        return bookRepository.findByPublishedYear(publishedYear);
     }
 
 }

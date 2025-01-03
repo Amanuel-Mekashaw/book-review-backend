@@ -36,4 +36,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findBooksByAuthorFirstNameOrLastName(@Param("firstName") String firstName,
             @Param("lastName") String lastName);
 
+    // find books by language
+    List<Book> findByLanguage(String language);
+
+    // find Books by published year
+    List<Book> findByPublishedYear(int publishedYear);
 }

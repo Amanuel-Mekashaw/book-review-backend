@@ -36,4 +36,8 @@ public interface BookService {
     List<Book> findBooksByAuthorFirstNameOrLastName(String firstName, String lastName);
 
     void addNewBook(BookDTO bookRequest, MultipartFile coverImage);
+
+    List<Book> filterBooksByLanguage(String language);
+
+    List<Book> filterBooksByPublishedYear(int publishedYear);
 }

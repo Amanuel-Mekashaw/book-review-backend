@@ -82,6 +82,41 @@ public class BookController {
 
     }
 
+    @Operation(summary = "Get books by language", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/by-language")
+    public ResponseEntity<?> getBookByLanguage(@RequestParam(required = true) String language,
+            @PageableDefault(size = 30) Pageable pageable) {
+        ApiResponse<?> apiResponse;
+
+        if (language != null) {
+            List<Book> booksByLanguage = bookService.filterBooksByLanguage(language);
+            apiResponse = new ApiResponse<>("Books by language found", 200, booksByLanguage);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
+        apiResponse = new ApiResponse<>("books by language not found", 404, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+
+    }
+
+    @Operation(summary = "Get books by published year", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/by-publishedyear")
+    public ResponseEntity<ApiResponse<List<Book>>> getBookByLanguage(
+            @RequestParam(required = true) Integer publishedYear,
+            @PageableDefault(size = 30) Pageable pageable) {
+        ApiResponse<List<Book>> apiResponse;
+
+        if (publishedYear != null) {
+            List<Book> booksByLanguage = bookService.filterBooksByPublishedYear(publishedYear);
+            apiResponse = new ApiResponse<>("Books by published year found", 200, booksByLanguage);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
+        apiResponse = new ApiResponse<>("books by published year not found", 404, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+
+    }
+
     @Operation(summary = "Get single book", security = @SecurityRequirement(name = "bearerAuth"))
     @JsonView(BookAuthorView.Detailed.class)
     @GetMapping("/genre/{id}")
