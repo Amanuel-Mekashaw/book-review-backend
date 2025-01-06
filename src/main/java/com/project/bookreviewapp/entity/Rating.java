@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -37,7 +38,8 @@ public class Rating {
     private User user;
 
     @ManyToOne
-    @JsonIgnore
+    @JsonIgnoreProperties({ "isbn", "description", "publishedYear", "publisher", "pages", "language", "author",
+            "genres", "collections", "ratings", "averageRating", "ratingCount", "createdAt", "updatedAt" })
     private Book book;
 
     @Column(name = "rating_value")

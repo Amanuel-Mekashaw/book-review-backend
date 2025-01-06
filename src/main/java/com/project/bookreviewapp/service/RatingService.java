@@ -14,4 +14,6 @@ public interface RatingService {
     List<Rating> getAllRatingsByBook(Book book);
 
     public List<Rating> getRatingsByBookIdAndValue(Long bookId, int ratingValue);
+
+    public List<Rating> getRatingsByUserId(Long userId);
 }

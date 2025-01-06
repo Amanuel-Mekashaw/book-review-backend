@@ -50,6 +50,23 @@ public class RatingController {
         }
     }
 
+    @GetMapping("/getuserratings/{userId}")
+    public ResponseEntity<ApiResponse<List<Rating>>> getAllRatingByUserId(@PathVariable Long userId) {
+        ApiResponse<List<Rating>> apiResponse;
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("\n\n\nuser with id " + userId + " not found\n\n\n"));
+
+        if (user != null) {
+            List<Rating> ratings = ratingService.getRatingsByUserId(user.getId());
+            apiResponse = new ApiResponse<>("Rating found by the user", 200, ratings);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            apiResponse = new ApiResponse<>("Rating not found by the user", 404, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/rate")
     public ResponseEntity<ApiResponse<String>> rateBook(@RequestParam(required = true) Long userId,
             @RequestParam(required = true) Long bookId, @RequestParam() int ratingValue) {

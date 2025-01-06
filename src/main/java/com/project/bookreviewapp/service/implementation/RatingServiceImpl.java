@@ -67,4 +67,9 @@ public class RatingServiceImpl implements RatingService {
         return ratingRepository.findByBookIdAndRatingValue(bookId, ratingValue);
     }
 
+    @Override
+    public List<Rating> getRatingsByUserId(Long userId) {
+        return ratingRepository.findByUserId(userId);
+    }
+
 }
