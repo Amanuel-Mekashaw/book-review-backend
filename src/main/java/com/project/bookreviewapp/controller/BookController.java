@@ -9,6 +9,7 @@ import com.project.bookreviewapp.dto.BookDTO;
 import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.Genre;
 import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Status;
 import com.project.bookreviewapp.mapper.BookMapper;
 import com.project.bookreviewapp.repository.GenreRepository;
 import com.project.bookreviewapp.repository.UserRepository;
@@ -174,6 +175,15 @@ public class BookController {
         ApiResponse<String> apiResponse;
 
         BookDTO bookRequest = new ObjectMapper().readValue(bookDto, BookDTO.class);
+
+        User foundAuthor = userRepository.findById(bookRequest.getAuthorId())
+                .orElseThrow(() -> new EntityNotFoundException("user by " + bookRequest.getAuthorId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
         System.out.println("\n\n\n" + bookRequest + "\n\n\n");
         bookService.addNewBook(bookRequest, coverImage);
         apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
@@ -196,6 +206,11 @@ public class BookController {
         // get user by id
         User foundAuthor = userRepository.findById(bookRequest.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookRequest.getAuthorId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
 
         // get the genres by id
         List<Genre> genres = genreRepository.findAllById(bookRequest.getGenreIds());
@@ -225,8 +240,14 @@ public class BookController {
     @Operation(summary = "create a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
     public ResponseEntity<ApiResponse<Book>> createBook(@RequestBody @Valid BookDTO bookDTO) {
+        ApiResponse<Book> apiResponse;
         User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't create books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
 
         // Fetch the genres
         List<Genre> genres = genreRepository.findAllById(bookDTO.getGenreIds());
@@ -241,24 +262,29 @@ public class BookController {
 
         createdBook = bookService.saveBook(createdBook);
 
-        ApiResponse<Book> apiResponse = new ApiResponse<Book>("Book saved successfully", 201, createdBook);
+        apiResponse = new ApiResponse<Book>("Book saved successfully", 201, createdBook);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "update a book", security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Book>> updateBook(@RequestBody @Valid BookDTO bookDTO, @PathVariable Long id) {
+        ApiResponse<Book> apiResponse;
         Book foundBook = bookService.getBookById(id);
 
         User foundAuthor = userRepository.findById(bookDTO.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookDTO.getAuthorId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
         // Fetch the genres
         List<Genre> genres = genreRepository.findAllById(bookDTO.getGenreIds());
         if (genres.size() != bookDTO.getGenreIds().size()) {
             throw new EntityNotFoundException("One or more genres not found");
         }
 
-        ApiResponse<Book> apiResponse;
         if (foundBook != null && foundAuthor != null) {
             foundBook = BookMapper.bookDtoToBook(bookDTO, userRepository, genreRepository);
             foundBook.setId(id);

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.bookreviewapp.dto.CollectionDTO;
 import com.project.bookreviewapp.entity.Collection;
 import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Status;
 import com.project.bookreviewapp.mapper.CollectionMapper;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.CollectionService;
@@ -66,12 +67,12 @@ public class CollectionController {
         try {
             List<Collection> privateCollections = collectionService.getPrivateCollection(userId);
 
-            if(privateCollections != null) {
+            if (privateCollections != null) {
                 apiResponse = new ApiResponse<>("Private Collection retrieved successfully", 200, privateCollections);
                 return new ResponseEntity<>(apiResponse, HttpStatus.OK);
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             apiResponse = new ApiResponse<>("Private Collection not found", 404, null);
 
             return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
@@ -86,12 +87,12 @@ public class CollectionController {
         try {
             List<Collection> privateCollections = collectionService.getPublicCollection();
 
-            if(privateCollections != null) {
+            if (privateCollections != null) {
                 apiResponse = new ApiResponse<>("Public Collection retrieved successfully", 200, privateCollections);
                 return new ResponseEntity<>(apiResponse, HttpStatus.OK);
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             apiResponse = new ApiResponse<>("Private Collection not found", 404, null);
 
             return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
@@ -119,18 +120,23 @@ public class CollectionController {
     public ResponseEntity<ApiResponse<Collection>> saveCollection(@RequestBody @Valid CollectionDTO collectionDto) {
 
         System.out.println("\n\n\n" + collectionDto + "\n\n\n");
+        ApiResponse<Collection> apiResponse;
 
         User foundAuthor = userRepository.findById(collectionDto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + collectionDto.getUserId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't rate a books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
 
         Collection collection = CollectionMapper.collectionDTOToCollection(collectionDto);
         collection.setUser(foundAuthor);
         collection = collectionService.saveCollection(collection);
 
-        ApiResponse<Collection> apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
+        apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
-
 
     }
 
@@ -138,11 +144,17 @@ public class CollectionController {
     public ResponseEntity<ApiResponse<Collection>> updateCollection(@RequestBody @Valid CollectionDTO collectionDTO,
             @PathVariable Long id) {
 
+        ApiResponse<Collection> apiResponse;
+
         Collection foundCollection = collectionService.getCollection(id);
         User foundUser = userRepository.findById(collectionDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id " + collectionDTO.getUserId() + " isn't found"));
 
-        ApiResponse<Collection> apiResponse;
+        if (foundUser.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't rate a books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
         if (foundCollection != null && foundUser != null) {
             foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
             foundCollection.setId(id);

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bookreviewapp.dto.AuthorDetailDTO;
 import com.project.bookreviewapp.entity.AuthorDetail;
 import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Status;
 import com.project.bookreviewapp.mapper.AuthorDetailMapper;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.AuthorDetailService;
@@ -97,6 +98,15 @@ public class AuthorDetailController {
 
         AuthorDetailDTO authorDetailDTO = new ObjectMapper().readValue(authorDetail, AuthorDetailDTO.class);
 
+        User foundAuthor = userRepository.findById(authorDetailDTO.getUserId())
+                .orElseThrow(
+                        () -> new EntityNotFoundException("user by " + authorDetailDTO.getUserId() + " not found"));
+
+        if (foundAuthor.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+
         authorDetailService.addNewUserDetail(authorDetailDTO, profilePhoto);
 
         apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
@@ -119,6 +129,11 @@ public class AuthorDetailController {
 
         User user = userRepository.findById(authorDetailDTO.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("user by this id" + authorDetailDTO.getUserId() + " not found"));
+
+        if (user.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
 
         if (user != null && foundAuthorDetail != null) {
             foundAuthorDetail = AuthorDetailMapper.authorDetailDtoToAuthorDetail(authorDetailDTO, userRepository);

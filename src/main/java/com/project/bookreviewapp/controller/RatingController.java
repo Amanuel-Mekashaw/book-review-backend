@@ -16,6 +16,7 @@ import com.project.bookreviewapp.dto.RatingDTO;
 import com.project.bookreviewapp.entity.Book;
 import com.project.bookreviewapp.entity.Rating;
 import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Status;
 import com.project.bookreviewapp.repository.BookRepository;
 import com.project.bookreviewapp.repository.UserRepository;
 import com.project.bookreviewapp.service.RatingService;
@@ -96,6 +97,11 @@ public class RatingController {
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         Book book = bookRepository.findById(ratingDTO.getBookId())
                 .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+
+        if (user.getStatus() == Status.INACTIVE) {
+            apiResponse = new ApiResponse<>("you can't rate a books admin have inactived your account", 200, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
 
         if (user != null && book != null) {
             apiResponse = new ApiResponse<>("Rating submitted successfully", 200);
