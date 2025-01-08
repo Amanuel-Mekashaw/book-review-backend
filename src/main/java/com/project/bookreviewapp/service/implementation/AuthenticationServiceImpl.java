@@ -18,6 +18,7 @@ import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
 import com.project.bookreviewapp.config.JwtService;
+import com.project.bookreviewapp.entity.Appeal.AppealState;
 import com.project.bookreviewapp.entity.Collection;
 import com.project.bookreviewapp.entity.User;
 import com.project.bookreviewapp.entity.User.Role;
@@ -96,6 +97,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         repository.save(user);
 
         log.info("Role {} assigned to user {}", newRole, username);
+    }
+
+    // change status
+    @Override
+    public void assignStatus(String token, String email, Status state) throws Exception {
+        // Extract the role of the requester
+        String requesterRole = jwtService.extractRole(token.replace("Bearer ", ""));
+
+        if (!"ADMIN".equalsIgnoreCase(requesterRole)) {
+            throw new AccessDeniedException("Only ADMIN can assign roles.");
+        }
+
+        Status appealState;
+
+        try {
+            appealState = Status.valueOf(state.toString());
+
+            // Fetch the user and assign the role
+            User user = repository.findByEmail(email)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+            user.setStatus(appealState);
+            repository.save(user);
+
+            log.info("Status {} assigned to user {}", state, email);
+
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + String.valueOf(state));
+        }
     }
 
     @Override

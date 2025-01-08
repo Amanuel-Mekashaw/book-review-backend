@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.bookreviewapp.auth.AssignRole;
+import com.project.bookreviewapp.auth.AssignStatus;
 import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
@@ -140,6 +141,33 @@ public class UserController {
         }
 
         apiResponse = new ApiResponse<>("Role assigned successfully!", 200, null);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/assign-status")
+    public ResponseEntity<ApiResponse<String>> assignRole(@RequestHeader("Authorization") String token,
+            @RequestBody @Valid AssignStatus assignStatus) throws Exception {
+
+        ApiResponse<String> apiResponse;
+
+        if (token == null || !token.startsWith("Bearer ")) {
+            apiResponse = new ApiResponse<>("Token is missing or invalid", 400);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            authenticationService.assignStatus(token, assignStatus.getEmail(), assignStatus.getStatus());
+        } catch (AuthenticationException e) {
+
+            apiResponse = new ApiResponse<>(e.getMessage(), 403);
+            return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            apiResponse = new ApiResponse<>("An error occurred on the server", 500);
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        apiResponse = new ApiResponse<>("status assigned successfully!", 200, null);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 

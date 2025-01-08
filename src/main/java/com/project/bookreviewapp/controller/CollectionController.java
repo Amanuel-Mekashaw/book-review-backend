@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -33,15 +34,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/collections")
+@RequiredArgsConstructor
 public class CollectionController {
 
     private final CollectionService collectionService;
     private final UserRepository userRepository;
-
-    public CollectionController(CollectionService collectionService, UserRepository userRepository) {
-        this.collectionService = collectionService;
-        this.userRepository = userRepository;
-    }
 
     @Operation(summary = "Get all collection", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
@@ -126,17 +123,18 @@ public class CollectionController {
                 .orElseThrow(() -> new EntityNotFoundException("user by " + collectionDto.getUserId() + " not found"));
 
         if (foundAuthor.getStatus() == Status.INACTIVE) {
-            apiResponse = new ApiResponse<>("you can't rate a books admin have inactived your account", 200, null);
+            apiResponse = new ApiResponse<>("you can't create a collection admin have inactived your account", 200,
+                    null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        } else {
+            Collection collection = CollectionMapper.collectionDTOToCollection(collectionDto);
+            collection.setUser(foundAuthor);
+            collection = collectionService.saveCollection(collection);
+
+            apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
         }
-
-        Collection collection = CollectionMapper.collectionDTOToCollection(collectionDto);
-        collection.setUser(foundAuthor);
-        collection = collectionService.saveCollection(collection);
-
-        apiResponse = new ApiResponse<Collection>("Collection saved", 201, collection);
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
 
     }
 
@@ -151,21 +149,22 @@ public class CollectionController {
                 () -> new EntityNotFoundException("user by this id " + collectionDTO.getUserId() + " isn't found"));
 
         if (foundUser.getStatus() == Status.INACTIVE) {
-            apiResponse = new ApiResponse<>("you can't rate a books admin have inactived your account", 200, null);
-            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-        }
-
-        if (foundCollection != null && foundUser != null) {
-            foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
-            foundCollection.setId(id);
-            foundCollection.setCreatedAt(foundCollection.getCreatedAt());
-            foundCollection = collectionService.saveCollection(foundCollection);
-
-            apiResponse = new ApiResponse<>("collection updated successfully", 200, foundCollection);
+            apiResponse = new ApiResponse<>("you can't create a collection admin have inactived your account", 200,
+                    null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
         } else {
-            apiResponse = new ApiResponse<>("collection didn't update", 401, null);
-            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            if (foundCollection != null && foundUser != null) {
+                foundCollection = CollectionMapper.collectionDTOToCollection(collectionDTO);
+                foundCollection.setId(id);
+                foundCollection.setCreatedAt(foundCollection.getCreatedAt());
+                foundCollection = collectionService.saveCollection(foundCollection);
+
+                apiResponse = new ApiResponse<>("collection updated successfully", 200, foundCollection);
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            } else {
+                apiResponse = new ApiResponse<>("collection didn't update", 401, null);
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }
         }
 
     }

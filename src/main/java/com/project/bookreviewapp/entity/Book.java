@@ -55,7 +55,6 @@ public class Book {
     private String isbn;
 
     @JsonView(BookAuthorView.Summary.class)
-
     private String description;
 
     @Column(name = "published_year")

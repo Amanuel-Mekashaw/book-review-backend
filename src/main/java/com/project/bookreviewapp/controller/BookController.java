@@ -179,15 +179,18 @@ public class BookController {
         User foundAuthor = userRepository.findById(bookRequest.getAuthorId())
                 .orElseThrow(() -> new EntityNotFoundException("user by " + bookRequest.getAuthorId() + " not found"));
 
+        System.out.println("\n\n\nstatus: " + foundAuthor.getStatus() + "\n\n\n");
+
         if (foundAuthor.getStatus() == Status.INACTIVE) {
             apiResponse = new ApiResponse<>("you can't update books admin have inactived your account", 200, null);
             return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-        }
 
-        System.out.println("\n\n\n" + bookRequest + "\n\n\n");
-        bookService.addNewBook(bookRequest, coverImage);
-        apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
-        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+        } else {
+            System.out.println("\n\n\n" + bookRequest + "\n\n\n");
+            bookService.addNewBook(bookRequest, coverImage);
+            apiResponse = new ApiResponse<>("Book saved sucssessfully", 201, null);
+            return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+        }
 
     }
 

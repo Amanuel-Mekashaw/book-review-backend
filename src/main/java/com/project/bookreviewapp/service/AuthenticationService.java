@@ -6,6 +6,7 @@ import com.project.bookreviewapp.auth.AuthenticationRequest;
 import com.project.bookreviewapp.auth.AuthenticationResponse;
 import com.project.bookreviewapp.auth.RegisterRequest;
 import com.project.bookreviewapp.entity.User;
+import com.project.bookreviewapp.entity.User.Status;
 
 public interface AuthenticationService {
 
@@ -16,6 +17,8 @@ public interface AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception;
 
     public void assignRole(String token, String email, String role) throws Exception;
+
+    public void assignStatus(String token, String email, Status state) throws Exception;
 
     public List<User> getAllUsers(String token) throws Exception;
 
